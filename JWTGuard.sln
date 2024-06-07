@@ -7,6 +7,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{F80B9FFF-6C2
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JWTGuard", "src\JWTGuard\JWTGuard.csproj", "{1AB856E7-D88C-4D7F-820B-9C603AF1A783}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JWTGuard.SampleApi", "src\JWTGuard.SampleApi\JWTGuard.SampleApi.csproj", "{F76C3E4A-DF67-4EB7-B16A-893EF53F157F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -20,8 +22,13 @@ Global
 		{1AB856E7-D88C-4D7F-820B-9C603AF1A783}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1AB856E7-D88C-4D7F-820B-9C603AF1A783}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1AB856E7-D88C-4D7F-820B-9C603AF1A783}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F76C3E4A-DF67-4EB7-B16A-893EF53F157F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F76C3E4A-DF67-4EB7-B16A-893EF53F157F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F76C3E4A-DF67-4EB7-B16A-893EF53F157F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F76C3E4A-DF67-4EB7-B16A-893EF53F157F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{1AB856E7-D88C-4D7F-820B-9C603AF1A783} = {F80B9FFF-6C21-46A9-9C79-A7CDA2EAD1C4}
+		{F76C3E4A-DF67-4EB7-B16A-893EF53F157F} = {F80B9FFF-6C21-46A9-9C79-A7CDA2EAD1C4}
 	EndGlobalSection
 EndGlobal
