@@ -13,7 +13,7 @@ public class JwtTypeTests(TargetApiWebApplicationFactory factory) : IClassFixtur
     {
         // Arrange
         var client = factory.CreateClient();
-        var jwt = await factory.GetJwtAsync(tokenType);
+        var jwt = await GetJwtAsync(tokenType);
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
 
         // Act
@@ -29,7 +29,7 @@ public class JwtTypeTests(TargetApiWebApplicationFactory factory) : IClassFixtur
     {
         // Arrange
         var client = factory.CreateClient();
-        var jwt = await factory.GetJwtAsync(tokenType);
+        var jwt = await GetJwtAsync(tokenType);
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
 
         // Act
@@ -37,6 +37,13 @@ public class JwtTypeTests(TargetApiWebApplicationFactory factory) : IClassFixtur
 
         // Assert
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    }
+
+    private Task<string> GetJwtAsync(string tokenType)
+    {
+        return factory.CreateJwtBuilder()
+            .WithTokenType(tokenType)
+            .BuildAsync();
     }
 
     public static IEnumerable<object[]> GetValidJwtTypes()

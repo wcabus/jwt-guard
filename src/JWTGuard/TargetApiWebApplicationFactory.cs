@@ -1,11 +1,7 @@
-﻿using System.Security.Claims;
-
-using Duende.IdentityServer.Configuration;
+﻿using Duende.IdentityServer.Configuration;
 using Duende.IdentityServer.Models;
 using Duende.IdentityServer.Services;
 using Duende.IdentityServer.Test;
-
-using IdentityModel;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -15,7 +11,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace JWTGuard;
 
-public class TargetApiWebApplicationFactory : WebApplicationFactory<Program>
+public class TargetApiWebApplicationFactory : WebApplicationFactory<Program>, ISigningCredentialsProvider
 {
     private WebApplication? _duendeHost;
     private CancellationTokenSource? _duendeHostCancellationSource;
@@ -25,7 +21,7 @@ public class TargetApiWebApplicationFactory : WebApplicationFactory<Program>
     public const string Audience = "api";
     public const string Issuer = "https://localhost:5901";
 
-    private static readonly TestUser Alice = new()
+    public static readonly TestUser DefaultTestUser = new()
     {
         SubjectId = "1",
         Username = "alice",
@@ -41,30 +37,9 @@ public class TargetApiWebApplicationFactory : WebApplicationFactory<Program>
 
     public string TargetUrl => "/weatherforecast";
 
-    public async Task<string> GetJwtAsync(string tokenType)
-    {
-        var signingCredentials = await GetSigningCredentialsAsync();
+    public JwtBuilder CreateJwtBuilder() => new(this, _tokenHandler);
 
-        var tokenPayload = new SecurityTokenDescriptor
-        {
-            TokenType = tokenType,
-            Audience = GetExpectedAudience(),
-            Issuer = GetExpectedIssuer(),
-            SigningCredentials = signingCredentials,
-            IssuedAt = DateTime.UtcNow,
-            NotBefore = DateTime.UtcNow.AddSeconds(-10),
-            Expires = DateTime.UtcNow.AddMinutes(5),
-            Subject = new ClaimsIdentity([
-                new Claim(JwtClaimTypes.Subject, Alice.SubjectId),
-                new Claim(JwtClaimTypes.Name, Alice.Username),
-                new Claim(JwtClaimTypes.PreferredUserName, Alice.Username)
-            ])
-        };
-
-        return _tokenHandler.CreateToken(tokenPayload);
-    }
-
-    private async Task<SigningCredentials> GetSigningCredentialsAsync()
+    async Task<SigningCredentials> ISigningCredentialsProvider.GetSigningCredentialsAsync(string algorithm)
     {
         if (_duendeHost is null)
         {
@@ -77,13 +52,10 @@ public class TargetApiWebApplicationFactory : WebApplicationFactory<Program>
         using var scope = _duendeHost.Services.CreateScope();
         var keyMaterialService = scope.ServiceProvider.GetRequiredService<IKeyMaterialService>();
 
-        return await keyMaterialService.GetSigningCredentialsAsync([SecurityAlgorithms.RsaSsaPssSha256]);
+        return await keyMaterialService.GetSigningCredentialsAsync([algorithm]);
     }
 
-    private string GetExpectedAudience() => Audience;
-    private string GetExpectedIssuer() => Issuer;
-
-    override protected void ConfigureWebHost(IWebHostBuilder builder)
+    protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.ConfigureTestServices(services =>
         {
@@ -108,11 +80,9 @@ public class TargetApiWebApplicationFactory : WebApplicationFactory<Program>
         builder.Services
             .AddIdentityServer(options =>
             {
-                options.KeyManagement.SigningAlgorithms = [ 
-                    new SigningAlgorithmOptions(SecurityAlgorithms.RsaSsaPssSha256),
-                    new SigningAlgorithmOptions(SecurityAlgorithms.RsaSha256),
-                    new SigningAlgorithmOptions(SecurityAlgorithms.EcdsaSha256)
-                ];
+                options.KeyManagement.SigningAlgorithms = TestSettings.DuendeSupportedSecurityAlgorithms
+                    .Select(alg => new SigningAlgorithmOptions(alg))
+                    .ToArray();
             })
             .AddInMemoryApiScopes([
                 new ApiScope(Audience)
@@ -130,10 +100,8 @@ public class TargetApiWebApplicationFactory : WebApplicationFactory<Program>
             ])
             .AddInMemoryClients(ConfigureClients())
             .AddInMemoryPersistedGrants()
-            .AddTestUsers([Alice])
+            .AddTestUsers([DefaultTestUser])
             .AddKeyManagement();
-            //.AddDeveloperSigningCredential(true, "ps256.key", IdentityServerConstants.RsaSigningAlgorithm.PS256)
-            //.AddDeveloperSigningCredential(true, "rs256.key", IdentityServerConstants.RsaSigningAlgorithm.RS256);
 
         _duendeHost = builder.Build();
 
