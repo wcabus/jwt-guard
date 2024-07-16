@@ -6,6 +6,7 @@ using Duende.IdentityServer.Configuration;
 
 using Xunit;
 using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace JWTGuard;
 
@@ -93,51 +94,57 @@ public class ExternalSignatureTests(TargetApiWebApplicationFactory factory) : Jw
         switch (testCase)
         {
             case ExternalSignatureTestCase.UseJwkClaim:
-                {
-                    SecurityKey? securityKey;
-
-                    if (signatureAlgorithm.StartsWith("ES"))
-                    {
-                        var curve = signatureAlgorithm switch
-                        {
-                            SecurityAlgorithms.EcdsaSha256 => JsonWebKeyECTypes.P256,
-                            SecurityAlgorithms.EcdsaSha384 => JsonWebKeyECTypes.P384,
-                            SecurityAlgorithms.EcdsaSha512 => JsonWebKeyECTypes.P521,
-                            _ => JsonWebKeyECTypes.P256
-                        };
-
-                        securityKey = CryptoHelper.CreateECDsaSecurityKey(curve);
-                    }
-                    else 
-                    {
-                        securityKey = CryptoHelper.CreateRsaSecurityKey();
-                    }
-                    
-                    var jsonWebKey = JsonWebKeyConverter.ConvertFromSecurityKey(securityKey);
-                    jsonWebKey.Alg = signatureAlgorithm;
-                    jsonWebKey.Use = "sig";
-
-                    header["jwk"] = jsonWebKey.ToDictionary();
-                    header["kid"] = jsonWebKey.KeyId;
-
-                    headerAndPayload = header.Base64UrlEncode() + "." + encodedPayload;
-        
-                    var asciiBytes = Encoding.ASCII.GetBytes(headerAndPayload);
-                    var signatureProvider = CryptoProviderFactory.Default.CreateForSigning(securityKey, signatureAlgorithm);
-                    try
-                    {
-                        var signatureBytes = signatureProvider.Sign(asciiBytes);
-                        signature = Base64UrlEncoder.Encode(signatureBytes);
-                    }
-                    finally
-                    {
-                        CryptoProviderFactory.Default.ReleaseSignatureProvider(signatureProvider);
-                    }
-                }
+                signature = InjectJsonWebKey(signatureAlgorithm, header, encodedPayload, out headerAndPayload);
                 break;
+
+            default:
+                return jwtBuilder.BuildAsync().GetAwaiter().GetResult();
         }
 
         return headerAndPayload + "." + signature;
+    }
+
+    private string InjectJsonWebKey(string signatureAlgorithm, JwtHeader header, string encodedPayload, out string headerAndPayload)
+    {
+        SecurityKey? securityKey;
+
+        if (signatureAlgorithm.StartsWith("ES"))
+        {
+            var curve = signatureAlgorithm switch
+            {
+                SecurityAlgorithms.EcdsaSha256 => JsonWebKeyECTypes.P256,
+                SecurityAlgorithms.EcdsaSha384 => JsonWebKeyECTypes.P384,
+                SecurityAlgorithms.EcdsaSha512 => JsonWebKeyECTypes.P521,
+                _ => JsonWebKeyECTypes.P256
+            };
+
+            securityKey = CryptoHelper.CreateECDsaSecurityKey(curve);
+        }
+        else
+        {
+            securityKey = CryptoHelper.CreateRsaSecurityKey();
+        }
+
+        var jsonWebKey = JsonWebKeyConverter.ConvertFromSecurityKey(securityKey);
+        jsonWebKey.Alg = signatureAlgorithm;
+        jsonWebKey.Use = "sig";
+
+        header["jwk"] = jsonWebKey.ToDictionary();
+        header["kid"] = jsonWebKey.KeyId;
+
+        headerAndPayload = header.Base64UrlEncode() + "." + encodedPayload;
+
+        var asciiBytes = Encoding.ASCII.GetBytes(headerAndPayload);
+        var signatureProvider = CryptoProviderFactory.Default.CreateForSigning(securityKey, signatureAlgorithm);
+        try
+        {
+            var signatureBytes = signatureProvider.Sign(asciiBytes);
+            return Base64UrlEncoder.Encode(signatureBytes);
+        }
+        finally
+        {
+            CryptoProviderFactory.Default.ReleaseSignatureProvider(signatureProvider);
+        }
     }
 
     private enum ExternalSignatureTestCase
