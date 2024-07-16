@@ -1,4 +1,6 @@
-﻿using Duende.IdentityServer.Configuration;
+﻿using System.Diagnostics;
+
+using Duende.IdentityServer.Configuration;
 using Duende.IdentityServer.Models;
 using Duende.IdentityServer.Services;
 using Duende.IdentityServer.Test;
@@ -139,6 +141,7 @@ public class TargetApiWebApplicationFactory : WebApplicationFactory<Program>, IS
         if (disposing)
         {
             _duendeHostCancellationSource?.Cancel();
+            _duendeHost?.DisposeAsync().GetAwaiter().GetResult();
         }
 
         base.Dispose(disposing);

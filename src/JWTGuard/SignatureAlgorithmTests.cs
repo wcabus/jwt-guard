@@ -5,19 +5,18 @@ using Xunit;
 
 namespace JWTGuard;
 
-public class SignatureAlgorithmTests(TargetApiWebApplicationFactory factory) : IClassFixture<TargetApiWebApplicationFactory>
+public class SignatureAlgorithmTests(TargetApiWebApplicationFactory factory) : JwtGuardTestBase(factory)
 {
     [Theory]
     [MemberData(nameof(GetSupportedAlgorithms))]
     public async Task Accessing_AuthorizedUrl_Is_Authorized_For_Supported_Signature_Algorithms(string signatureAlgorithm)
     {
         // Arrange
-        var client = factory.CreateClient();
         var jwt = await GetJwtAsync(signatureAlgorithm);
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
+        Client!.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
 
         // Act
-        var response = await client.GetAsync(factory.TargetUrl);
+        var response = await Client.GetAsync(Factory.TargetUrl);
 
         // Assert
         Assert.NotEqual(HttpStatusCode.Unauthorized, response.StatusCode);
@@ -28,12 +27,11 @@ public class SignatureAlgorithmTests(TargetApiWebApplicationFactory factory) : I
     public async Task Accessing_AuthorizedUrl_Is_Unauthorized_For_Unsupported_Signature_Algorithms(string signatureAlgorithm)
     {
         // Arrange
-        var client = factory.CreateClient();
         var jwt = await GetJwtAsync(signatureAlgorithm);
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
+        Client!.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
 
         // Act
-        var response = await client.GetAsync(factory.TargetUrl);
+        var response = await Client.GetAsync(Factory.TargetUrl);
 
         // Assert
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
@@ -41,7 +39,7 @@ public class SignatureAlgorithmTests(TargetApiWebApplicationFactory factory) : I
 
     private Task<string> GetJwtAsync(string signatureAlgorithm)
     {
-        return factory.CreateJwtBuilder()
+        return Factory.CreateJwtBuilder()
             .WithSignatureAlgorithm(signatureAlgorithm)
             .BuildAsync();
     }

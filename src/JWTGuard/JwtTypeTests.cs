@@ -5,19 +5,18 @@ using Xunit;
 
 namespace JWTGuard;
 
-public class JwtTypeTests(TargetApiWebApplicationFactory factory) : IClassFixture<TargetApiWebApplicationFactory>
+public class JwtTypeTests(TargetApiWebApplicationFactory factory) : JwtGuardTestBase(factory)
 {
     [Theory]
     [MemberData(nameof(GetValidJwtTypes))]
     public async Task Accessing_AuthorizedUrl_Is_Authorized_For_Valid_JWT_Types(string tokenType)
     {
         // Arrange
-        var client = factory.CreateClient();
         var jwt = await GetJwtAsync(tokenType);
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
+        Client!.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
 
         // Act
-        var response = await client.GetAsync(factory.TargetUrl);
+        var response = await Client.GetAsync(Factory.TargetUrl);
 
         // Assert
         Assert.NotEqual(HttpStatusCode.Unauthorized, response.StatusCode);
@@ -28,12 +27,11 @@ public class JwtTypeTests(TargetApiWebApplicationFactory factory) : IClassFixtur
     public async Task Accessing_AuthorizedUrl_Is_Unauthorized_For_Invalid_JWT_Types(string tokenType)
     {
         // Arrange
-        var client = factory.CreateClient();
         var jwt = await GetJwtAsync(tokenType);
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
+        Client!.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
 
         // Act
-        var response = await client.GetAsync(factory.TargetUrl);
+        var response = await Client.GetAsync(Factory.TargetUrl);
 
         // Assert
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
@@ -41,7 +39,7 @@ public class JwtTypeTests(TargetApiWebApplicationFactory factory) : IClassFixtur
 
     private Task<string> GetJwtAsync(string tokenType)
     {
-        return factory.CreateJwtBuilder()
+        return Factory.CreateJwtBuilder()
             .WithTokenType(tokenType)
             .BuildAsync();
     }
