@@ -101,19 +101,19 @@ public readonly struct TestSettings
     public string DefaultSignatureAlgorithm { get; init; } = SecurityAlgorithms.RsaSsaPssSha256;
 
     /// <summary>
-    /// Collection of unsupported signature algorithms. Defaults to [ "custom", "none", "nOnE", "HS256", "HS384", "HS512", "RS256", "RS384", "RS512" ].
+    /// Collection of unsupported signature algorithms. Defaults to [ "custom", "none", "nOnE", "RS256", "RS384", "RS512", "HS256", "HS384", "HS512" ].
     /// </summary>
     public IReadOnlyCollection<string> UnsupportedAlgorithms { get; init; } = 
     [
         "custom",
         SecurityAlgorithms.None,
         "nOnE",
-        SecurityAlgorithms.HmacSha256,
-        SecurityAlgorithms.HmacSha384,
-        SecurityAlgorithms.HmacSha512,
         SecurityAlgorithms.RsaSha256,
         SecurityAlgorithms.RsaSha384,
-        SecurityAlgorithms.RsaSha512
+        SecurityAlgorithms.RsaSha512,
+        SecurityAlgorithms.HmacSha256,
+        SecurityAlgorithms.HmacSha384,
+        SecurityAlgorithms.HmacSha512
     ];
 
     /// <summary>

@@ -7,7 +7,7 @@ namespace JWTGuard;
 
 public class SignatureAlgorithmTests(TargetApiWebApplicationFactory factory) : JwtGuardTestBase(factory)
 {
-    [Theory]
+    [Theory(DisplayName = "When a token uses a supported signature algorithm, the API should not return a 401 Unauthorized response.")]
     [MemberData(nameof(GetSupportedAlgorithms))]
     public async Task Accessing_AuthorizedUrl_Is_Authorized_For_Supported_Signature_Algorithms(string signatureAlgorithm)
     {
@@ -22,7 +22,7 @@ public class SignatureAlgorithmTests(TargetApiWebApplicationFactory factory) : J
         Assert.NotEqual(HttpStatusCode.Unauthorized, response.StatusCode);
     }
 
-    [Theory]
+    [Theory(DisplayName = "When a token uses an unsupported signature algorithm, the API should return a 401 Unauthorized response.")]
     [MemberData(nameof(GetUnsupportedAlgorithms))]
     public async Task Accessing_AuthorizedUrl_Is_Unauthorized_For_Unsupported_Signature_Algorithms(string signatureAlgorithm)
     {

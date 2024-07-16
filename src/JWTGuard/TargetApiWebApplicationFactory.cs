@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-using Duende.IdentityServer.Configuration;
+﻿using Duende.IdentityServer.Configuration;
 using Duende.IdentityServer.Models;
 using Duende.IdentityServer.Services;
 using Duende.IdentityServer.Test;
@@ -66,6 +64,7 @@ public class TargetApiWebApplicationFactory : WebApplicationFactory<Program>, IS
             {
                 options.Authority = Issuer;
                 options.Audience = Audience;
+                options.TokenValidationParameters.ValidIssuer = Issuer;
             });
         });
     }

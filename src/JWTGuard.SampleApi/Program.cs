@@ -1,5 +1,11 @@
+using System.Diagnostics;
+using System.IdentityModel.Tokens.Jwt;
+
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
+
+const string authority = "https://demo.duendesoftware.com";
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,16 +17,33 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddAuthentication()
     .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
     {
-        options.Authority = "https://demo.duendesoftware.com";
+        options.Authority = authority;
         options.Audience = "api";
 
         options.TokenValidationParameters = new()
         {
-            ValidTypes = [ "at+jwt" ],
             ValidAlgorithms = [
                 SecurityAlgorithms.EcdsaSha256, SecurityAlgorithms.EcdsaSha384, SecurityAlgorithms.EcdsaSha512,
                 SecurityAlgorithms.RsaSsaPssSha256, SecurityAlgorithms.RsaSsaPssSha384, SecurityAlgorithms.RsaSsaPssSha512
-            ]
+            ],
+            ValidIssuer = authority,
+            ValidTypes = ["at+jwt"],
+
+            RequireAudience = true,
+            RequireExpirationTime = true,
+            RequireSignedTokens = true,
+
+            ValidateAudience = true,
+            ValidateIssuer = true,
+            ValidateIssuerSigningKey = true,
+            //IssuerSigningKeyResolver = (token, securityToken, kid, parameters) =>
+            //{
+            //    // retrieve signing key from token.
+            //    var header = JwtHeader.Base64UrlDeserialize(token.Split('.')[0]);
+            //    var jwk = header["jwk"];
+            //    return [ JsonWebKey.Create(jwk.ToString()) ];
+            //},
+            ValidateLifetime = true
         };
     });
 

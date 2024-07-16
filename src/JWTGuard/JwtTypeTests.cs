@@ -7,7 +7,7 @@ namespace JWTGuard;
 
 public class JwtTypeTests(TargetApiWebApplicationFactory factory) : JwtGuardTestBase(factory)
 {
-    [Theory]
+    [Theory(DisplayName = "When a token uses an expected token type, the API should not return a 401 Unauthorized response.")]
     [MemberData(nameof(GetValidJwtTypes))]
     public async Task Accessing_AuthorizedUrl_Is_Authorized_For_Valid_JWT_Types(string tokenType)
     {
@@ -22,7 +22,7 @@ public class JwtTypeTests(TargetApiWebApplicationFactory factory) : JwtGuardTest
         Assert.NotEqual(HttpStatusCode.Unauthorized, response.StatusCode);
     }
 
-    [Theory]
+    [Theory(DisplayName = "When a token uses an unexpected token type, the API should return a 401 Unauthorized response.")]
     [MemberData(nameof(GetInvalidJwtTypes))]
     public async Task Accessing_AuthorizedUrl_Is_Unauthorized_For_Invalid_JWT_Types(string tokenType)
     {

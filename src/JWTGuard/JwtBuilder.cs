@@ -122,6 +122,20 @@ public class JwtBuilder
         return this;
     }
 
+    public JwtHeader BuildJwtHeader()
+    {
+        return new JwtHeader
+        {
+            [JwtHeaderParameterNames.Alg] = SignatureAlgorithm,
+            [JwtHeaderParameterNames.Typ] = TokenType
+        };
+    }
+
+    public JwtPayload BuildJwtPayload()
+    {
+        return new JwtPayload(Issuer, Audience, Subject?.Claims ?? [], NotBefore, Expires, IssuedAt);
+    }
+
     public async Task<string> BuildAsync()
     {
         SigningCredentials ??= await GetSigningCredentialsAsync();
@@ -131,14 +145,7 @@ public class JwtBuilder
             !TestSettings.KnownSecurityAlgorithms.Contains(SignatureAlgorithm)))
         {
             // Either using "none" (case-insensitive) or an unknown algorithm.
-
-            var header = new JwtHeader 
-            {
-                [JwtHeaderParameterNames.Alg] = SignatureAlgorithm, 
-                [JwtHeaderParameterNames.Typ] = TokenType 
-            };
-
-            return header.Base64UrlEncode() + "." + GenerateTokenPayload() + ".";
+            return BuildJwtHeader().Base64UrlEncode() + "." + BuildJwtPayload().Base64UrlEncode() + ".";
         }
 
         var tokenPayload = new SecurityTokenDescriptor
@@ -156,13 +163,6 @@ public class JwtBuilder
         return _tokenHandler.CreateToken(tokenPayload);
     }
 
-    private string GenerateTokenPayload()
-    {
-        var payload = new JwtPayload(Issuer, Audience, Subject?.Claims ?? [], NotBefore, Expires, IssuedAt);
-        return payload.Base64UrlEncode();
-    }
-
-    // TODO What if we want to sign a token with HS256, HS384, or HS512?
     private async Task<SigningCredentials?> GetSigningCredentialsAsync()
     {
         if (SignatureAlgorithm is null)
