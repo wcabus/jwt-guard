@@ -7,8 +7,9 @@ using Duende.IdentityServer.Configuration;
 using Xunit;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using JWTGuard.Helpers;
 
-namespace JWTGuard;
+namespace JWTGuard.Tests;
 
 public class ExternalSignatureTests(TargetApiWebApplicationFactory factory) : JwtGuardTestBase(factory)
 {
@@ -74,7 +75,7 @@ public class ExternalSignatureTests(TargetApiWebApplicationFactory factory) : Jw
         var signatureAlgorithm = TestSettings.CurrentTestSettings.SupportedAlgorithms
             .Where(x => x.StartsWith("ES") || x.StartsWith("PS") || x.StartsWith("RS"))
             .MinBy(_ => Random.Shared.Next()); // Takes the first result at random
-        
+
         if (signatureAlgorithm is null)
         {
             throw new InvalidOperationException("No supported signature algorithm found that supports using a certificate.");
@@ -85,9 +86,9 @@ public class ExternalSignatureTests(TargetApiWebApplicationFactory factory) : Jw
 
         var header = jwtBuilder.BuildJwtHeader();
         var payload = jwtBuilder.BuildJwtPayload();
-        
+
         var encodedPayload = payload.Base64UrlEncode();
-        
+
         var headerAndPayload = "";
         var signature = "";
 
@@ -95,6 +96,10 @@ public class ExternalSignatureTests(TargetApiWebApplicationFactory factory) : Jw
         {
             case ExternalSignatureTestCase.UseJwkClaim:
                 signature = InjectJsonWebKey(signatureAlgorithm, header, encodedPayload, out headerAndPayload);
+                break;
+
+            case ExternalSignatureTestCase.UseJkuAndKidClaims:
+                signature = UseExternalJsonWebKey(signatureAlgorithm, header, encodedPayload, out headerAndPayload);
                 break;
 
             default:
@@ -106,25 +111,7 @@ public class ExternalSignatureTests(TargetApiWebApplicationFactory factory) : Jw
 
     private string InjectJsonWebKey(string signatureAlgorithm, JwtHeader header, string encodedPayload, out string headerAndPayload)
     {
-        SecurityKey? securityKey;
-
-        if (signatureAlgorithm.StartsWith("ES"))
-        {
-            var curve = signatureAlgorithm switch
-            {
-                SecurityAlgorithms.EcdsaSha256 => JsonWebKeyECTypes.P256,
-                SecurityAlgorithms.EcdsaSha384 => JsonWebKeyECTypes.P384,
-                SecurityAlgorithms.EcdsaSha512 => JsonWebKeyECTypes.P521,
-                _ => JsonWebKeyECTypes.P256
-            };
-
-            securityKey = CryptoHelper.CreateECDsaSecurityKey(curve);
-        }
-        else
-        {
-            securityKey = CryptoHelper.CreateRsaSecurityKey();
-        }
-
+        var securityKey = SecurityKeyBuilder.CreateSecurityKey(signatureAlgorithm);
         var jsonWebKey = JsonWebKeyConverter.ConvertFromSecurityKey(securityKey);
         jsonWebKey.Alg = signatureAlgorithm;
         jsonWebKey.Use = "sig";
@@ -132,6 +119,21 @@ public class ExternalSignatureTests(TargetApiWebApplicationFactory factory) : Jw
         header["jwk"] = jsonWebKey.ToDictionary();
         header["kid"] = jsonWebKey.KeyId;
 
+        return SignAndReturnJwt(header, encodedPayload, signatureAlgorithm, securityKey, out headerAndPayload);
+    }
+
+    private string UseExternalJsonWebKey(string signatureAlgorithm, JwtHeader header, string encodedPayload, out string headerAndPayload)
+    {
+        (string keyId, SecurityKey securityKey) = TargetApiWebApplicationFactory.GetExternalSecurityKeyData(signatureAlgorithm);
+
+        header["jku"] = $"{TargetApiWebApplicationFactory.Issuer}/external-jwks?alg={signatureAlgorithm}";
+        header["kid"] = keyId;
+
+        return SignAndReturnJwt(header, encodedPayload, signatureAlgorithm, securityKey, out headerAndPayload);
+    }
+
+    private string SignAndReturnJwt(JwtHeader header, string encodedPayload, string signatureAlgorithm, SecurityKey securityKey, out string headerAndPayload)
+    {
         headerAndPayload = header.Base64UrlEncode() + "." + encodedPayload;
 
         var asciiBytes = Encoding.ASCII.GetBytes(headerAndPayload);

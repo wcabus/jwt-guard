@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc.Testing;
+﻿using JWTGuard.Helpers;
+
+using Microsoft.AspNetCore.Mvc.Testing;
 
 using Xunit;
 
-namespace JWTGuard;
+namespace JWTGuard.Tests;
 
 [Collection(JwtGuardTestCollection.CollectionName)]
 public abstract class JwtGuardTestBase(TargetApiWebApplicationFactory factory) : IAsyncLifetime

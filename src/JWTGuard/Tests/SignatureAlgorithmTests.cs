@@ -1,9 +1,11 @@
 ﻿using System.Net;
 using System.Net.Http.Headers;
 
+using JWTGuard.Helpers;
+
 using Xunit;
 
-namespace JWTGuard;
+namespace JWTGuard.Tests;
 
 public class SignatureAlgorithmTests(TargetApiWebApplicationFactory factory) : JwtGuardTestBase(factory)
 {

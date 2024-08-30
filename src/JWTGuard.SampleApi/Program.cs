@@ -36,6 +36,8 @@ builder.Services.AddAuthentication()
             ValidateAudience = true,
             ValidateIssuer = true,
             ValidateIssuerSigningKey = true,
+
+            //// This code would allow specifying a JsonWebKey as part of the token's header
             //IssuerSigningKeyResolver = (token, securityToken, kid, parameters) =>
             //{
             //    // retrieve signing key from token.
@@ -43,6 +45,18 @@ builder.Services.AddAuthentication()
             //    var jwk = header["jwk"];
             //    return [ JsonWebKey.Create(jwk.ToString()) ];
             //},
+
+            //// This code would allow specifying an external JsonWebKey by specifying a URL containing the keys as part of the token's header
+            //IssuerSigningKeyResolver = (token, securityToken, kid, parameters) =>
+            //{
+            //    // retrieve signing key from external url.
+            //    var header = JwtHeader.Base64UrlDeserialize(token.Split('.')[0]);
+            //    var url = header["jku"] as string;
+            //    var client = new HttpClient();
+            //    var jwks = client.GetStringAsync(url).GetAwaiter().GetResult();
+            //    return JsonWebKeySet.Create(jwks).Keys;
+            //},
+
             ValidateLifetime = true
         };
     });

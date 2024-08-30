@@ -1,4 +1,6 @@
-﻿using Duende.IdentityServer.Configuration;
+﻿using System.Net;
+
+using Duende.IdentityServer.Configuration;
 using Duende.IdentityServer.Models;
 using Duende.IdentityServer.Services;
 using Duende.IdentityServer.Test;
@@ -9,7 +11,7 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 
-namespace JWTGuard;
+namespace JWTGuard.Helpers;
 
 public class TargetApiWebApplicationFactory : WebApplicationFactory<Program>, ISigningCredentialsProvider
 {
@@ -20,6 +22,8 @@ public class TargetApiWebApplicationFactory : WebApplicationFactory<Program>, IS
 
     public const string Audience = "api";
     public const string Issuer = "https://localhost:5901";
+
+    private static readonly Dictionary<string, (string KeyId, SecurityKey SecurityKey)> GeneratedSecurityKeys = new();
 
     public static readonly TestUser DefaultTestUser = new()
     {
@@ -109,10 +113,47 @@ public class TargetApiWebApplicationFactory : WebApplicationFactory<Program>, IS
         _duendeHost.UseStaticFiles();
         _duendeHost.UseRouting();
         _duendeHost.UseIdentityServer();
+
+        _duendeHost.MapGet("/external-jwks", async context =>
+        {
+            var signatureAlgorithm = context.Request.Query["alg"];
+            if (string.IsNullOrEmpty(signatureAlgorithm))
+            {
+                context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                await context.Response.WriteAsync("400 - Bad Request.");
+                
+                return;
+            }
+
+            var securityKeyData = GetExternalSecurityKeyData(signatureAlgorithm!);
+            var jsonWebKey = JsonWebKeyConverter.ConvertFromSecurityKey(securityKeyData.SecurityKey);
+            jsonWebKey.Alg = signatureAlgorithm;
+            jsonWebKey.Use = "sig";
+
+            var keys = new JsonWebKeys();
+            keys.Keys.Add(jsonWebKey);
+
+            await context.Response.WriteAsJsonAsync(keys);
+        });
+
         _duendeHost.UseAuthorization();
 
         _duendeHostCancellationSource = new CancellationTokenSource();
         _duendeHost.RunAsync(_duendeHostCancellationSource.Token);
+    }
+
+    public static (string KeyId, SecurityKey SecurityKey) GetExternalSecurityKeyData(string signatureAlgorithm)
+    {
+        if (GeneratedSecurityKeys.TryGetValue(signatureAlgorithm!, out var securityKeyData))
+        {
+            return securityKeyData;
+        }
+
+        var securityKey = SecurityKeyBuilder.CreateSecurityKey(signatureAlgorithm!);
+        securityKeyData = (securityKey.KeyId, securityKey);
+        GeneratedSecurityKeys.Add(signatureAlgorithm!, securityKeyData);
+
+        return securityKeyData;
     }
 
     private static IEnumerable<Client> ConfigureClients()

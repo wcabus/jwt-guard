@@ -1,6 +1,8 @@
-﻿using Xunit;
+﻿using JWTGuard.Helpers;
 
-namespace JWTGuard;
+using Xunit;
+
+namespace JWTGuard.Tests;
 
 [CollectionDefinition(CollectionName)]
 public class JwtGuardTestCollection : ICollectionFixture<TargetApiWebApplicationFactory>

@@ -1,6 +1,6 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 
-namespace JWTGuard;
+namespace JWTGuard.Helpers;
 
 internal static class JsonWebKeyExtensions
 {

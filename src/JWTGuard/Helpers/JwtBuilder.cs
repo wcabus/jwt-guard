@@ -11,7 +11,7 @@ using Microsoft.IdentityModel.Tokens;
 
 using JwtHeaderParameterNames = Microsoft.IdentityModel.JsonWebTokens.JwtHeaderParameterNames;
 
-namespace JWTGuard;
+namespace JWTGuard.Helpers;
 
 public class JwtBuilder
 {
@@ -25,11 +25,11 @@ public class JwtBuilder
     }
 
     public string TokenType { get; private set; } = TestSettings.CurrentTestSettings.ValidTokenTypes.FirstOrDefault() ?? "";
-    
+
     public string Audience { get; private set; } = TargetApiWebApplicationFactory.Audience;
-    
+
     public string Issuer { get; private set; } = TargetApiWebApplicationFactory.Issuer;
-    
+
     public SigningCredentials? SigningCredentials { get; private set; }
     public string? SignatureAlgorithm { get; private set; }
     public string? HmacShaSecret { get; private set; } = Guid.NewGuid().ToString() + Guid.NewGuid(); // Ensure this is long enough for 512-bit HMAC by default.
@@ -37,7 +37,7 @@ public class JwtBuilder
     public DateTime IssuedAt { get; private set; } = DateTime.UtcNow;
     public DateTime NotBefore { get; private set; } = DateTime.UtcNow.AddSeconds(-10);
     public DateTime Expires { get; private set; } = DateTime.UtcNow.AddMinutes(5);
-    
+
     public ClaimsIdentity? Subject { get; private set; } = new([
         new Claim(JwtClaimTypes.Subject, TargetApiWebApplicationFactory.DefaultTestUser.SubjectId),
         new Claim(JwtClaimTypes.Name, TargetApiWebApplicationFactory.DefaultTestUser.Username),
@@ -140,7 +140,7 @@ public class JwtBuilder
     {
         SigningCredentials ??= await GetSigningCredentialsAsync();
 
-        if (!string.IsNullOrEmpty(SignatureAlgorithm) && 
+        if (!string.IsNullOrEmpty(SignatureAlgorithm) &&
             (string.Equals(SecurityAlgorithms.None, SignatureAlgorithm, StringComparison.OrdinalIgnoreCase) ||
             !TestSettings.KnownSecurityAlgorithms.Contains(SignatureAlgorithm)))
         {
