@@ -7,6 +7,8 @@ using Duende.IdentityServer.Configuration;
 using Xunit;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Cryptography.X509Certificates;
+
 using JWTGuard.Helpers;
 
 namespace JWTGuard.Tests;
@@ -102,6 +104,14 @@ public class ExternalSignatureTests(TargetApiWebApplicationFactory factory) : Jw
                 signature = UseExternalJsonWebKey(signatureAlgorithm, header, encodedPayload, out headerAndPayload);
                 break;
 
+            case ExternalSignatureTestCase.UseX5cClaim:
+                signature = InjectCertificate(signatureAlgorithm, header, encodedPayload, out headerAndPayload);
+                break;
+
+            case ExternalSignatureTestCase.UseX5uClaim:
+                signature = UseExternalCertificate(signatureAlgorithm, header, encodedPayload, out headerAndPayload);
+                break;
+
             default:
                 return jwtBuilder.BuildAsync().GetAwaiter().GetResult();
         }
@@ -127,6 +137,27 @@ public class ExternalSignatureTests(TargetApiWebApplicationFactory factory) : Jw
         (string keyId, SecurityKey securityKey) = TargetApiWebApplicationFactory.GetExternalSecurityKeyData(signatureAlgorithm);
 
         header["jku"] = $"{TargetApiWebApplicationFactory.Issuer}/external-jwks?alg={signatureAlgorithm}";
+        header["kid"] = keyId;
+
+        return SignAndReturnJwt(header, encodedPayload, signatureAlgorithm, securityKey, out headerAndPayload);
+    }
+
+    private string InjectCertificate(string signatureAlgorithm, JwtHeader header, string encodedPayload, out string headerAndPayload)
+    {
+        var securityKey = SecurityKeyBuilder.CreateSecurityKey(signatureAlgorithm);
+        var certificate = SecurityKeyBuilder.GetCertificatePublicKeyPem(securityKey);
+
+        header["x5c"] = new[] { certificate };
+        header["kid"] = securityKey.KeyId;
+
+        return SignAndReturnJwt(header, encodedPayload, signatureAlgorithm, securityKey, out headerAndPayload);
+    }
+
+    private string UseExternalCertificate(string signatureAlgorithm, JwtHeader header, string encodedPayload, out string headerAndPayload)
+    {
+        (string keyId, SecurityKey securityKey) = TargetApiWebApplicationFactory.GetExternalSecurityKeyData(signatureAlgorithm);
+
+        header["x5u"] = $"{TargetApiWebApplicationFactory.Issuer}/external-cert?alg={signatureAlgorithm}";
         header["kid"] = keyId;
 
         return SignAndReturnJwt(header, encodedPayload, signatureAlgorithm, securityKey, out headerAndPayload);

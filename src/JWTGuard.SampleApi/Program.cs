@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Cryptography;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.JsonWebTokens;
@@ -55,6 +56,61 @@ builder.Services.AddAuthentication()
             //    var client = new HttpClient();
             //    var jwks = client.GetStringAsync(url).GetAwaiter().GetResult();
             //    return JsonWebKeySet.Create(jwks).Keys;
+            //},
+
+            //// This code would allow specifying a certificate as part of the token's header
+            //IssuerSigningKeyResolver = (token, securityToken, kid, parameters) =>
+            //{
+            //    // retrieve certificate from token
+            //    var header = JwtHeader.Base64UrlDeserialize(token.Split('.')[0]);
+            //    var certs = header["x5c"] as List<object>;
+            //    var certPem = certs![0] as string;
+
+            //    SecurityKey? securityKey;
+            //    if (certPem!.Contains("RSA PUBLIC", StringComparison.Ordinal))
+            //    {
+            //        var rsaSecurityKey = new RsaSecurityKey(RSA.Create());
+            //        rsaSecurityKey.Rsa.ImportFromPem(certPem);
+
+            //        securityKey = rsaSecurityKey;
+            //    }
+            //    else
+            //    {
+            //        var ecdsaSecurityKey = new ECDsaSecurityKey(ECDsa.Create());
+            //        ecdsaSecurityKey.ECDsa.ImportFromPem(certPem);
+
+            //        securityKey = ecdsaSecurityKey;
+            //    }
+
+            //    return [JsonWebKeyConverter.ConvertFromSecurityKey(securityKey)];
+            //},
+
+            //// This code would allow specifying an external certificate by specifying a URL containing the keys as part of the token's header
+            //IssuerSigningKeyResolver = (token, securityToken, kid, parameters) =>
+            //{
+            //    // retrieve certificate from external url.
+            //    var header = JwtHeader.Base64UrlDeserialize(token.Split('.')[0]);
+            //    var url = header["x5u"] as string;
+            //    var client = new HttpClient();
+            //    var certPem = client.GetStringAsync(url).GetAwaiter().GetResult();
+
+            //    SecurityKey? securityKey;
+            //    if (certPem!.Contains("RSA PUBLIC", StringComparison.Ordinal))
+            //    {
+            //        var rsaSecurityKey = new RsaSecurityKey(RSA.Create());
+            //        rsaSecurityKey.Rsa.ImportFromPem(certPem);
+
+            //        securityKey = rsaSecurityKey;
+            //    }
+            //    else
+            //    {
+            //        var ecdsaSecurityKey = new ECDsaSecurityKey(ECDsa.Create());
+            //        ecdsaSecurityKey.ECDsa.ImportFromPem(certPem);
+
+            //        securityKey = ecdsaSecurityKey;
+            //    }
+
+            //    return [JsonWebKeyConverter.ConvertFromSecurityKey(securityKey)];
             //},
 
             ValidateLifetime = true

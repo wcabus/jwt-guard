@@ -136,6 +136,23 @@ public class TargetApiWebApplicationFactory : WebApplicationFactory<Program>, IS
             await context.Response.WriteAsJsonAsync(keys);
         });
 
+        _duendeHost.MapGet("/external-cert", async context =>
+        {
+            var signatureAlgorithm = context.Request.Query["alg"];
+            if (string.IsNullOrEmpty(signatureAlgorithm))
+            {
+                context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                await context.Response.WriteAsync("400 - Bad Request.");
+
+                return;
+            }
+
+            var securityKeyData = GetExternalSecurityKeyData(signatureAlgorithm!);
+            var pem = SecurityKeyBuilder.GetCertificatePublicKeyPem(securityKeyData.SecurityKey);
+
+            await context.Response.WriteAsync(pem);
+        });
+
         _duendeHost.UseAuthorization();
 
         _duendeHostCancellationSource = new CancellationTokenSource();
