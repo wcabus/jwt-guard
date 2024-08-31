@@ -115,12 +115,7 @@ public readonly struct TestSettings
         SecurityAlgorithms.HmacSha384,
         SecurityAlgorithms.HmacSha512
     ];
-
-    /// <summary>
-    /// Public key used for verifying and signing tokens using an HMAC algorithm. Defaults to "hmac-public-key".
-    /// </summary>
-    public string HmacPublicKey { get; init; } = "hmac-public-key";
-
+    
     /// <summary>
     /// Expected issuer. Defaults to "https://jwtguard.net".
     /// </summary>
