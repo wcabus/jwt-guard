@@ -1,10 +1,41 @@
-﻿namespace JWTGuard;
+﻿using Microsoft.IdentityModel.Tokens;
+
+namespace JWTGuard;
 
 /// <summary>
 /// Configure settings for the JWTGuard tests.
 /// </summary>
 public readonly struct TestSettings
 {
+    public static readonly IReadOnlyCollection<string> KnownSecurityAlgorithms =
+    [
+        SecurityAlgorithms.EcdsaSha256,
+        SecurityAlgorithms.EcdsaSha384,
+        SecurityAlgorithms.EcdsaSha512,
+        SecurityAlgorithms.RsaSsaPssSha256,
+        SecurityAlgorithms.RsaSsaPssSha384,
+        SecurityAlgorithms.RsaSsaPssSha512,
+        SecurityAlgorithms.HmacSha256,
+        SecurityAlgorithms.HmacSha384,
+        SecurityAlgorithms.HmacSha512,
+        SecurityAlgorithms.RsaSha256,
+        SecurityAlgorithms.RsaSha384,
+        SecurityAlgorithms.RsaSha512
+    ];
+
+    public static readonly IReadOnlyCollection<string> DuendeSupportedSecurityAlgorithms =
+    [
+        SecurityAlgorithms.EcdsaSha256,
+        SecurityAlgorithms.EcdsaSha384,
+        SecurityAlgorithms.EcdsaSha512,
+        SecurityAlgorithms.RsaSsaPssSha256,
+        SecurityAlgorithms.RsaSsaPssSha384,
+        SecurityAlgorithms.RsaSsaPssSha512,
+        SecurityAlgorithms.RsaSha256,
+        SecurityAlgorithms.RsaSha384,
+        SecurityAlgorithms.RsaSha512
+    ];
+
     static TestSettings()
     {
         // Override the default test settings here
@@ -35,47 +66,46 @@ public readonly struct TestSettings
     public static void ResetTestSettings() => CurrentTestSettings = DefaultTestSettings;
 
     /// <summary>
-    /// Collection of valid token types. Defaults to [ "at+jwt", "jwt" ], accepting both the default JWT type and the more specific JWT access token type.
+    /// Collection of valid token types. Defaults to [ "at+jwt" ].
     /// </summary>
-    public IReadOnlyCollection<string> ValidTokenTypes { get; init; } = [ "at+jwt", "jwt" ];
+    public IReadOnlyCollection<string> ValidTokenTypes { get; init; } = [ "at+jwt" ];
 
     /// <summary>
     /// Collection of invalid token types. Defaults to an empty collection.
     /// </summary>
-    public IReadOnlyCollection<string> InvalidTokenTypes { get; init; } = [ "none" ];
+    public IReadOnlyCollection<string> InvalidTokenTypes { get; init; } = [ "none", "jwt" ];
 
     /// <summary>
-    /// Collection of supported signature algorithms. Defaults to [ "ES256", "PS256" ].
+    /// Collection of supported signature algorithms. Defaults to [ "ES256", "ES384", "ES512", "PS256", "PS384", "PS512" ].
     /// </summary>
-    public IReadOnlyCollection<string> SupportedAlgorithms { get; init; } = ["ES256", "ES384", "ES512", "PS256", "PS384", "PS512"];
+    public IReadOnlyCollection<string> SupportedAlgorithms { get; init; } = 
+    [
+        SecurityAlgorithms.EcdsaSha256,
+        SecurityAlgorithms.EcdsaSha384,
+        SecurityAlgorithms.EcdsaSha512,
+        SecurityAlgorithms.RsaSsaPssSha256,
+        SecurityAlgorithms.RsaSsaPssSha384,
+        SecurityAlgorithms.RsaSsaPssSha512
+    ];
 
     /// <summary>
-    /// Collection of unsupported signature algorithms. Defaults to [ "custom", "none", "nOnE", "HS256", "HS384", "HS512", "RS256", "RS384", "RS512" ].
+    /// Default signature algorithm. Defaults to "PS256".
     /// </summary>
-    public IReadOnlyCollection<string> UnsupportedAlgorithms { get; init; } = ["custom", "none", "nOnE", "HS256", "HS384", "HS512", "RS256", "RS384", "RS512"];
+    public string DefaultSignatureAlgorithm { get; init; } = SecurityAlgorithms.RsaSsaPssSha256;
 
     /// <summary>
-    /// Public key used for verifying and signing tokens using an HMAC algorithm. Defaults to "hmac-public-key".
+    /// Collection of unsupported signature algorithms. Defaults to [ "custom", "none", "nOnE", "RS256", "RS384", "RS512", "HS256", "HS384", "HS512" ].
     /// </summary>
-    public string HmacPublicKey { get; init; } = "hmac-public-key";
-
-    /// <summary>
-    /// Expected issuer. Defaults to "https://jwtguard.net".
-    /// </summary>
-    public string Issuer { get; init; } = "https://jwtguard.net";
-
-    /// <summary>
-    /// Invalid issuer. Defaults to "https://invalid.jwtguard.net".
-    /// </summary>
-    public string InvalidIssuer { get; init; } = "https://invalid.jwtguard.net";
-
-    /// <summary>
-    /// Collection of valid audiences. Set this to your expected audiences. Defaults to <c>null</c>, meaning audiences are not validated.
-    /// </summary>
-    public IReadOnlyCollection<string>? ValidAudiences { get; init; }
-
-    /// <summary>
-    /// Collection of invalid audiences. Defaults to [ "https://invalid.jwtguard.net" ].
-    /// </summary>
-    public IReadOnlyCollection<string> InvalidAudiences { get; init; } = ["https://invalid.jwtguard.net"];
+    public IReadOnlyCollection<string> UnsupportedAlgorithms { get; init; } = 
+    [
+        "custom",
+        SecurityAlgorithms.None,
+        "nOnE",
+        SecurityAlgorithms.RsaSha256,
+        SecurityAlgorithms.RsaSha384,
+        SecurityAlgorithms.RsaSha512,
+        SecurityAlgorithms.HmacSha256,
+        SecurityAlgorithms.HmacSha384,
+        SecurityAlgorithms.HmacSha512
+    ];
 }

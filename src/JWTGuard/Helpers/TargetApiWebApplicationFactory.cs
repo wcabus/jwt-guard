@@ -1,11 +1,9 @@
-﻿using System.Security.Claims;
+﻿using System.Net;
 
 using Duende.IdentityServer.Configuration;
 using Duende.IdentityServer.Models;
 using Duende.IdentityServer.Services;
 using Duende.IdentityServer.Test;
-
-using IdentityModel;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -13,9 +11,9 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 
-namespace JWTGuard;
+namespace JWTGuard.Helpers;
 
-public class TargetApiWebApplicationFactory : WebApplicationFactory<Program>
+public class TargetApiWebApplicationFactory : WebApplicationFactory<Program>, ISigningCredentialsProvider
 {
     private WebApplication? _duendeHost;
     private CancellationTokenSource? _duendeHostCancellationSource;
@@ -25,7 +23,9 @@ public class TargetApiWebApplicationFactory : WebApplicationFactory<Program>
     public const string Audience = "api";
     public const string Issuer = "https://localhost:5901";
 
-    private static readonly TestUser Alice = new()
+    private static readonly Dictionary<string, (string KeyId, SecurityKey SecurityKey)> GeneratedSecurityKeys = new();
+
+    public static readonly TestUser DefaultTestUser = new()
     {
         SubjectId = "1",
         Username = "alice",
@@ -41,30 +41,9 @@ public class TargetApiWebApplicationFactory : WebApplicationFactory<Program>
 
     public string TargetUrl => "/weatherforecast";
 
-    public async Task<string> GetJwtAsync(string tokenType)
-    {
-        var signingCredentials = await GetSigningCredentialsAsync();
+    public JwtBuilder CreateJwtBuilder() => new(this, _tokenHandler);
 
-        var tokenPayload = new SecurityTokenDescriptor
-        {
-            TokenType = tokenType,
-            Audience = GetExpectedAudience(),
-            Issuer = GetExpectedIssuer(),
-            SigningCredentials = signingCredentials,
-            IssuedAt = DateTime.UtcNow,
-            NotBefore = DateTime.UtcNow.AddSeconds(-10),
-            Expires = DateTime.UtcNow.AddMinutes(5),
-            Subject = new ClaimsIdentity([
-                new Claim(JwtClaimTypes.Subject, Alice.SubjectId),
-                new Claim(JwtClaimTypes.Name, Alice.Username),
-                new Claim(JwtClaimTypes.PreferredUserName, Alice.Username)
-            ])
-        };
-
-        return _tokenHandler.CreateToken(tokenPayload);
-    }
-
-    private async Task<SigningCredentials> GetSigningCredentialsAsync()
+    async Task<SigningCredentials> ISigningCredentialsProvider.GetSigningCredentialsAsync(string algorithm)
     {
         if (_duendeHost is null)
         {
@@ -77,13 +56,10 @@ public class TargetApiWebApplicationFactory : WebApplicationFactory<Program>
         using var scope = _duendeHost.Services.CreateScope();
         var keyMaterialService = scope.ServiceProvider.GetRequiredService<IKeyMaterialService>();
 
-        return await keyMaterialService.GetSigningCredentialsAsync([SecurityAlgorithms.RsaSsaPssSha256]);
+        return await keyMaterialService.GetSigningCredentialsAsync([algorithm]);
     }
 
-    private string GetExpectedAudience() => Audience;
-    private string GetExpectedIssuer() => Issuer;
-
-    override protected void ConfigureWebHost(IWebHostBuilder builder)
+    protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.ConfigureTestServices(services =>
         {
@@ -92,6 +68,7 @@ public class TargetApiWebApplicationFactory : WebApplicationFactory<Program>
             {
                 options.Authority = Issuer;
                 options.Audience = Audience;
+                options.TokenValidationParameters.ValidIssuer = Issuer;
             });
         });
     }
@@ -108,11 +85,9 @@ public class TargetApiWebApplicationFactory : WebApplicationFactory<Program>
         builder.Services
             .AddIdentityServer(options =>
             {
-                options.KeyManagement.SigningAlgorithms = [ 
-                    new SigningAlgorithmOptions(SecurityAlgorithms.RsaSsaPssSha256),
-                    new SigningAlgorithmOptions(SecurityAlgorithms.RsaSha256),
-                    new SigningAlgorithmOptions(SecurityAlgorithms.EcdsaSha256)
-                ];
+                options.KeyManagement.SigningAlgorithms = TestSettings.DuendeSupportedSecurityAlgorithms
+                    .Select(alg => new SigningAlgorithmOptions(alg))
+                    .ToArray();
             })
             .AddInMemoryApiScopes([
                 new ApiScope(Audience)
@@ -130,20 +105,72 @@ public class TargetApiWebApplicationFactory : WebApplicationFactory<Program>
             ])
             .AddInMemoryClients(ConfigureClients())
             .AddInMemoryPersistedGrants()
-            .AddTestUsers([Alice])
+            .AddTestUsers([DefaultTestUser])
             .AddKeyManagement();
-            //.AddDeveloperSigningCredential(true, "ps256.key", IdentityServerConstants.RsaSigningAlgorithm.PS256)
-            //.AddDeveloperSigningCredential(true, "rs256.key", IdentityServerConstants.RsaSigningAlgorithm.RS256);
 
         _duendeHost = builder.Build();
 
         _duendeHost.UseStaticFiles();
         _duendeHost.UseRouting();
         _duendeHost.UseIdentityServer();
+
+        _duendeHost.MapGet("/external-jwks", async context =>
+        {
+            var signatureAlgorithm = context.Request.Query["alg"];
+            if (string.IsNullOrEmpty(signatureAlgorithm))
+            {
+                context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                await context.Response.WriteAsync("400 - Bad Request.");
+                
+                return;
+            }
+
+            var securityKeyData = GetExternalSecurityKeyData(signatureAlgorithm!);
+            var jsonWebKey = JsonWebKeyConverter.ConvertFromSecurityKey(securityKeyData.SecurityKey);
+            jsonWebKey.Alg = signatureAlgorithm;
+            jsonWebKey.Use = "sig";
+
+            var keys = new JsonWebKeys();
+            keys.Keys.Add(jsonWebKey);
+
+            await context.Response.WriteAsJsonAsync(keys);
+        });
+
+        _duendeHost.MapGet("/external-cert", async context =>
+        {
+            var signatureAlgorithm = context.Request.Query["alg"];
+            if (string.IsNullOrEmpty(signatureAlgorithm))
+            {
+                context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                await context.Response.WriteAsync("400 - Bad Request.");
+
+                return;
+            }
+
+            var securityKeyData = GetExternalSecurityKeyData(signatureAlgorithm!);
+            var pem = SecurityKeyBuilder.GetCertificatePublicKeyPem(securityKeyData.SecurityKey);
+
+            await context.Response.WriteAsync(pem);
+        });
+
         _duendeHost.UseAuthorization();
 
         _duendeHostCancellationSource = new CancellationTokenSource();
         _duendeHost.RunAsync(_duendeHostCancellationSource.Token);
+    }
+
+    public static (string KeyId, SecurityKey SecurityKey) GetExternalSecurityKeyData(string signatureAlgorithm)
+    {
+        if (GeneratedSecurityKeys.TryGetValue(signatureAlgorithm!, out var securityKeyData))
+        {
+            return securityKeyData;
+        }
+
+        var securityKey = SecurityKeyBuilder.CreateSecurityKey(signatureAlgorithm!);
+        securityKeyData = (securityKey.KeyId, securityKey);
+        GeneratedSecurityKeys.Add(signatureAlgorithm!, securityKeyData);
+
+        return securityKeyData;
     }
 
     private static IEnumerable<Client> ConfigureClients()
@@ -171,6 +198,7 @@ public class TargetApiWebApplicationFactory : WebApplicationFactory<Program>
         if (disposing)
         {
             _duendeHostCancellationSource?.Cancel();
+            _duendeHost?.DisposeAsync().GetAwaiter().GetResult();
         }
 
         base.Dispose(disposing);

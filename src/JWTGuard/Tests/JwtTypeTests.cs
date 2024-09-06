@@ -1,42 +1,49 @@
 ﻿using System.Net;
 using System.Net.Http.Headers;
 
+using JWTGuard.Helpers;
+
 using Xunit;
 
-namespace JWTGuard;
+namespace JWTGuard.Tests;
 
-public class JwtTypeTests(TargetApiWebApplicationFactory factory) : IClassFixture<TargetApiWebApplicationFactory>
+public class JwtTypeTests(TargetApiWebApplicationFactory factory) : JwtGuardTestBase(factory)
 {
-    [Theory]
+    [Theory(DisplayName = "When a token uses an expected token type, the API should not return a 401 Unauthorized response.")]
     [MemberData(nameof(GetValidJwtTypes))]
     public async Task Accessing_AuthorizedUrl_Is_Authorized_For_Valid_JWT_Types(string tokenType)
     {
         // Arrange
-        var client = factory.CreateClient();
-        var jwt = await factory.GetJwtAsync(tokenType);
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
+        var jwt = await GetJwtAsync(tokenType);
+        Client!.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
 
         // Act
-        var response = await client.GetAsync(factory.TargetUrl);
+        var response = await Client.GetAsync(Factory.TargetUrl);
 
         // Assert
         Assert.NotEqual(HttpStatusCode.Unauthorized, response.StatusCode);
     }
 
-    [Theory]
+    [Theory(DisplayName = "When a token uses an unexpected token type, the API should return a 401 Unauthorized response.")]
     [MemberData(nameof(GetInvalidJwtTypes))]
     public async Task Accessing_AuthorizedUrl_Is_Unauthorized_For_Invalid_JWT_Types(string tokenType)
     {
         // Arrange
-        var client = factory.CreateClient();
-        var jwt = await factory.GetJwtAsync(tokenType);
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
+        var jwt = await GetJwtAsync(tokenType);
+        Client!.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
 
         // Act
-        var response = await client.GetAsync(factory.TargetUrl);
+        var response = await Client.GetAsync(Factory.TargetUrl);
 
         // Assert
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    }
+
+    private Task<string> GetJwtAsync(string tokenType)
+    {
+        return Factory.CreateJwtBuilder()
+            .WithTokenType(tokenType)
+            .BuildAsync();
     }
 
     public static IEnumerable<object[]> GetValidJwtTypes()
