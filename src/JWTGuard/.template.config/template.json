@@ -1,0 +1,32 @@
+{
+    "$schema": "http://json.schemastore.org/template",
+    "author": "Wesley Cabus",
+    "classifications": [
+        "Test", 
+        "xUnit", 
+        "API", 
+        "Web", 
+        "Web API", 
+        "WebAPI", 
+        "Security", 
+        "JWT"
+    ],
+    "identity": "JWTGuard",
+    "name": "JWT Guard Test Suite",
+    "shortName": "jwt-guard",
+    "sourceName": "JWTGuard",
+    "preferNameDirectory": true,
+    "tags": {
+        "language": "C#",
+        "type": "project"
+    },
+    "symbols": {
+        "apiProject": {
+            "type": "parameter",
+            "datatype": "string",
+            "defaultValue": "..\\MyApi\\MyApi.csproj",
+            "replaces": "..\\JWTGuard.SampleApi\\JWTGuard.SampleApi.csproj",
+            "description": "Relative path to the Web API project on which you want to run JWTGuard's tests on."
+        }
+    }
+}
