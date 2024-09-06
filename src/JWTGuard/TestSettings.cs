@@ -36,13 +36,6 @@ public readonly struct TestSettings
         SecurityAlgorithms.RsaSha512
     ];
 
-    public static readonly IReadOnlyCollection<string> WeirdSecurityAlgorithms =
-    [
-        "custom",
-        SecurityAlgorithms.None,
-        "nOnE"
-    ];
-
     static TestSettings()
     {
         // Override the default test settings here
@@ -115,24 +108,4 @@ public readonly struct TestSettings
         SecurityAlgorithms.HmacSha384,
         SecurityAlgorithms.HmacSha512
     ];
-    
-    /// <summary>
-    /// Expected issuer. Defaults to "https://jwtguard.net".
-    /// </summary>
-    public string Issuer { get; init; } = "https://jwtguard.net";
-
-    /// <summary>
-    /// Invalid issuer. Defaults to "https://invalid.jwtguard.net".
-    /// </summary>
-    public string InvalidIssuer { get; init; } = "https://invalid.jwtguard.net";
-
-    /// <summary>
-    /// Collection of valid audiences. Set this to your expected audiences. Defaults to <c>null</c>, meaning audiences are not validated.
-    /// </summary>
-    public IReadOnlyCollection<string>? ValidAudiences { get; init; }
-
-    /// <summary>
-    /// Collection of invalid audiences. Defaults to [ "https://invalid.jwtguard.net" ].
-    /// </summary>
-    public IReadOnlyCollection<string> InvalidAudiences { get; init; } = ["https://invalid.jwtguard.net"];
 }
