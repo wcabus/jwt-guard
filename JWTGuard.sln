@@ -5,17 +5,20 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{F80B9FFF-6C21-46A9-9C79-A7CDA2EAD1C4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JWTGuard", "src\JWTGuard\JWTGuard.csproj", "{1AB856E7-D88C-4D7F-820B-9C603AF1A783}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JWTGuard", "src\JWTGuard\JWTGuard.csproj", "{1AB856E7-D88C-4D7F-820B-9C603AF1A783}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JWTGuard.SampleApi", "src\JWTGuard.SampleApi\JWTGuard.SampleApi.csproj", "{F76C3E4A-DF67-4EB7-B16A-893EF53F157F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JWTGuard.SampleApi", "src\JWTGuard.SampleApi\JWTGuard.SampleApi.csproj", "{F76C3E4A-DF67-4EB7-B16A-893EF53F157F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A8A743C8-2424-4EE4-9A9E-AE8E89B04105}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+		src\JWTGuard\.template.config\template.json = src\JWTGuard\.template.config\template.json
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{1AB856E7-D88C-4D7F-820B-9C603AF1A783}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -27,8 +30,14 @@ Global
 		{F76C3E4A-DF67-4EB7-B16A-893EF53F157F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F76C3E4A-DF67-4EB7-B16A-893EF53F157F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{1AB856E7-D88C-4D7F-820B-9C603AF1A783} = {F80B9FFF-6C21-46A9-9C79-A7CDA2EAD1C4}
 		{F76C3E4A-DF67-4EB7-B16A-893EF53F157F} = {F80B9FFF-6C21-46A9-9C79-A7CDA2EAD1C4}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {AAFA7134-41D2-46F1-86FE-E05299D70C1B}
 	EndGlobalSection
 EndGlobal
