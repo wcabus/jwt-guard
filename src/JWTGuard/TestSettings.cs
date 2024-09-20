@@ -1,4 +1,6 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using JWTGuard.Helpers;
+
+using Microsoft.IdentityModel.Tokens;
 
 namespace JWTGuard;
 
@@ -108,4 +110,24 @@ public readonly struct TestSettings
         SecurityAlgorithms.HmacSha384,
         SecurityAlgorithms.HmacSha512
     ];
+
+    /// <summary>
+    /// Collection of allowed audiences. Defaults to [ "api" ].
+    /// </summary>
+    public IReadOnlyCollection<string> AllowedAudiences { get; init; } = ["api"];
+
+    /// <summary>
+    /// Collection of disallowed audiences. Defaults to [ "another-api" ].
+    /// </summary>
+    public IReadOnlyCollection<string> DisallowedAudiences { get; init; } = ["another-api"];
+
+    /// <summary>
+    /// Collection of allowed issuers. Defaults to [ <see cref="TargetApiWebApplicationFactory.Issuer" /> ].
+    /// </summary>
+    public IReadOnlyCollection<string> AllowedIssuers { get; init; } = [TargetApiWebApplicationFactory.Issuer];
+
+    /// <summary>
+    /// Collection of disallowed issuers. Defaults to [ "" ].
+    /// </summary>
+    public IReadOnlyCollection<string> DisallowedIssuers { get; init; } = [ "https://my-idp.org" ];
 }
