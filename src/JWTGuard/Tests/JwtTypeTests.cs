@@ -11,8 +11,14 @@ public class JwtTypeTests(TargetApiWebApplicationFactory factory) : JwtGuardTest
 {
     [Theory(DisplayName = "When a token uses an expected token type, the API should not return a 401 Unauthorized response.")]
     [MemberData(nameof(GetValidJwtTypes))]
-    public async Task Accessing_AuthorizedUrl_Is_Authorized_For_Valid_JWT_Types(string tokenType)
+    public async Task Accessing_AuthorizedUrl_Is_Authorized_For_Valid_JWT_Types(string? tokenType)
     {
+        if (tokenType is null)
+        {
+            Assert.Null(tokenType);
+            return;
+        }
+
         // Arrange
         var jwt = await GetJwtAsync(tokenType);
         Client!.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
@@ -26,8 +32,14 @@ public class JwtTypeTests(TargetApiWebApplicationFactory factory) : JwtGuardTest
 
     [Theory(DisplayName = "When a token uses an unexpected token type, the API should return a 401 Unauthorized response.")]
     [MemberData(nameof(GetInvalidJwtTypes))]
-    public async Task Accessing_AuthorizedUrl_Is_Unauthorized_For_Invalid_JWT_Types(string tokenType)
+    public async Task Accessing_AuthorizedUrl_Is_Unauthorized_For_Invalid_JWT_Types(string? tokenType)
     {
+        if (tokenType is null)
+        {
+            Assert.Null(tokenType);
+            return;
+        }
+
         // Arrange
         var jwt = await GetJwtAsync(tokenType);
         Client!.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
@@ -46,29 +58,17 @@ public class JwtTypeTests(TargetApiWebApplicationFactory factory) : JwtGuardTest
             .BuildAsync();
     }
 
-    public static IEnumerable<object[]> GetValidJwtTypes()
+    public static TheoryData<string?> GetValidJwtTypes()
     {
-        if (TestSettings.CurrentTestSettings.ValidTokenTypes.Count == 0)
-        {
-            yield break;
-        }
-
-        foreach (string tokenType in TestSettings.CurrentTestSettings.ValidTokenTypes)
-        {
-            yield return [tokenType];
-        }
+        return TestSettings.CurrentTestSettings.ValidTokenTypes.Count == 0
+            ? new TheoryData<string?>([null])
+            : new TheoryData<string?>(TestSettings.CurrentTestSettings.ValidTokenTypes);
     }
 
-    public static IEnumerable<object[]> GetInvalidJwtTypes()
+    public static TheoryData<string?> GetInvalidJwtTypes()
     {
-        if (TestSettings.CurrentTestSettings.InvalidTokenTypes.Count == 0)
-        {
-            yield break;
-        }
-
-        foreach (string tokenType in TestSettings.CurrentTestSettings.InvalidTokenTypes)
-        {
-            yield return [tokenType];
-        }
+        return TestSettings.CurrentTestSettings.InvalidTokenTypes.Count == 0 
+            ? new TheoryData<string?>([null]) 
+            : new TheoryData<string?>(TestSettings.CurrentTestSettings.InvalidTokenTypes);
     }
 }

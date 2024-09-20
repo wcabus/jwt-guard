@@ -2,12 +2,9 @@
 using System.Net;
 using System.Text;
 
-using Duende.IdentityServer.Configuration;
-
 using Xunit;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
-using System.Security.Cryptography.X509Certificates;
 
 using JWTGuard.Helpers;
 

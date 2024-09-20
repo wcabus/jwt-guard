@@ -15,79 +15,74 @@ builder.Services.AddAuthentication()
         options.Authority = authority;
         options.Audience = "api";
 
-        // This code would allow specifying a JsonWebKey as part of the token's header
-        IEnumerable<SecurityKey> AllowJwkClaim(string token, SecurityToken securityToken, string kid, TokenValidationParameters parameters)
+        IEnumerable<SecurityKey> AllowSpecialCases(string token, SecurityToken securityToken, string kid, TokenValidationParameters parameters)
         {
-            // retrieve signing key from token.
             var header = JwtHeader.Base64UrlDeserialize(token.Split('.')[0]);
-            var jwk = header["jwk"];
-            return [JsonWebKey.Create(jwk.ToString())];
-        }
-
-        // This code would allow specifying an external JsonWebKey by specifying a URL containing the keys as part of the token's header
-        IEnumerable<SecurityKey> AllowJkuClaim(string token, SecurityToken securityToken, string kid, TokenValidationParameters parameters)
-        {
-            // retrieve signing key from external url.
-            var header = JwtHeader.Base64UrlDeserialize(token.Split('.')[0]);
-            var url = header["jku"] as string;
-            var client = new HttpClient();
-            var jwks = client.GetStringAsync(url).GetAwaiter().GetResult();
-            return JsonWebKeySet.Create(jwks).Keys;
-        }
-
-        // This code would allow specifying a certificate as part of the token's header
-        IEnumerable<SecurityKey> AllowX5cClaim(string token, SecurityToken securityToken, string kid, TokenValidationParameters parameters)
-        {
-            // retrieve certificate from token
-            var header = JwtHeader.Base64UrlDeserialize(token.Split('.')[0]);
-            var certs = header["x5c"] as List<object>;
-            var certPem = certs![0] as string;
-
-            SecurityKey? securityKey;
-            if (certPem!.Contains("RSA PUBLIC", StringComparison.Ordinal))
+            
+            if (header.TryGetValue("jwk", out object? jwk))
             {
-                var rsaSecurityKey = new RsaSecurityKey(RSA.Create());
-                rsaSecurityKey.Rsa.ImportFromPem(certPem);
-
-                securityKey = rsaSecurityKey;
-            }
-            else
-            {
-                var ecdsaSecurityKey = new ECDsaSecurityKey(ECDsa.Create());
-                ecdsaSecurityKey.ECDsa.ImportFromPem(certPem);
-
-                securityKey = ecdsaSecurityKey;
+                // This code would allow specifying a JsonWebKey as part of the token's header
+                return [JsonWebKey.Create(jwk.ToString())];
             }
 
-            return [JsonWebKeyConverter.ConvertFromSecurityKey(securityKey)];
-        }
-
-        // This code would allow specifying an external certificate by specifying a URL containing the keys as part of the token's header
-        IEnumerable<SecurityKey> AllowX5uClaim(string token, SecurityToken securityToken, string kid, TokenValidationParameters parameters)
-        {
-            // retrieve certificate from external url.
-            var header = JwtHeader.Base64UrlDeserialize(token.Split('.')[0]);
-            var url = header["x5u"] as string;
-            var client = new HttpClient();
-            var certPem = client.GetStringAsync(url).GetAwaiter().GetResult();
-
-            SecurityKey? securityKey;
-            if (certPem!.Contains("RSA PUBLIC", StringComparison.Ordinal))
+            if (header.TryGetValue("jku", out object? jku))
             {
-                var rsaSecurityKey = new RsaSecurityKey(RSA.Create());
-                rsaSecurityKey.Rsa.ImportFromPem(certPem);
-
-                securityKey = rsaSecurityKey;
-            }
-            else
-            {
-                var ecdsaSecurityKey = new ECDsaSecurityKey(ECDsa.Create());
-                ecdsaSecurityKey.ECDsa.ImportFromPem(certPem);
-
-                securityKey = ecdsaSecurityKey;
+                // This code would allow specifying an external JsonWebKey by specifying a URL containing the keys as part of the token's header
+                var client = new HttpClient();
+                var jwks = client.GetStringAsync(jku.ToString()).GetAwaiter().GetResult();
+                return JsonWebKeySet.Create(jwks).Keys;
             }
 
-            return [JsonWebKeyConverter.ConvertFromSecurityKey(securityKey)];
+            if (header.TryGetValue("x5c", out object? x5c))
+            {
+                // This code would allow specifying a certificate as part of the token's header
+                var certPem = (x5c as List<object>)![0] as string;
+
+                SecurityKey? securityKey;
+                if (certPem.Contains("RSA PUBLIC", StringComparison.Ordinal))
+                {
+                    var rsaSecurityKey = new RsaSecurityKey(RSA.Create());
+                    rsaSecurityKey.Rsa.ImportFromPem(certPem);
+
+                    securityKey = rsaSecurityKey;
+                }
+                else
+                {
+                    var ecdsaSecurityKey = new ECDsaSecurityKey(ECDsa.Create());
+                    ecdsaSecurityKey.ECDsa.ImportFromPem(certPem);
+
+                    securityKey = ecdsaSecurityKey;
+                }
+
+                return [JsonWebKeyConverter.ConvertFromSecurityKey(securityKey)];
+            }
+
+            if (header.TryGetValue("x5u", out object? x5u))
+            {
+                // This code would allow specifying an external certificate by specifying a URL containing the keys as part of the token's header
+                var client = new HttpClient();
+                var certPem = client.GetStringAsync(x5u.ToString()).GetAwaiter().GetResult();
+
+                SecurityKey? securityKey;
+                if (certPem.Contains("RSA PUBLIC", StringComparison.Ordinal))
+                {
+                    var rsaSecurityKey = new RsaSecurityKey(RSA.Create());
+                    rsaSecurityKey.Rsa.ImportFromPem(certPem);
+
+                    securityKey = rsaSecurityKey;
+                }
+                else
+                {
+                    var ecdsaSecurityKey = new ECDsaSecurityKey(ECDsa.Create());
+                    ecdsaSecurityKey.ECDsa.ImportFromPem(certPem);
+
+                    securityKey = ecdsaSecurityKey;
+                }
+
+                return [JsonWebKeyConverter.ConvertFromSecurityKey(securityKey)];
+            }
+
+            return Array.Empty<SecurityKey>();
         }
 
         options.TokenValidationParameters = new()
@@ -107,11 +102,8 @@ builder.Services.AddAuthentication()
             ValidateIssuer = true,
             ValidateIssuerSigningKey = true,
 
-            // Uncomment one of the following lines to enable the corresponding signing key resolver
-            //IssuerSigningKeyResolver = AllowJwkClaim,
-            //IssuerSigningKeyResolver = AllowJkuClaim,
-            //IssuerSigningKeyResolver = AllowX5cClaim,
-            //IssuerSigningKeyResolver = AllowX5cClaim,
+            // Uncomment the following line to enable special signing key resolvers
+            // IssuerSigningKeyResolver = AllowSpecialCases,
 
             ValidateLifetime = true
         };
