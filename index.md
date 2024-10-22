@@ -70,3 +70,5 @@ JWT Guard contains integration tests, which uses a `WebApplicationFactory` imple
 
 public partial class Program {}
 ```
+
+That should be enough in order to run the JWT Guard test suite!
