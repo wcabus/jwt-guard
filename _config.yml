@@ -1,0 +1,16 @@
+title: JWT Guard
+description: A starter template for a Jeykll site using the Just the Docs theme!
+theme: just-the-docs
+logo: "images/logo.png"
+
+url: https://jwtguard.net
+
+aux_links:
+  "JWT Guard on GitHub":
+    - "//github.com/wcabus/jwt-guard"
+
+gh_edit_link: true
+gh_edit_link_text: "Edit this page on GitHub."
+gh_edit_repository: "https://github.com/wcabus/jwt-guard" 
+gh_edit_branch: "gh-pages" 
+gh_edit_view_mode: "tree"
