@@ -20,7 +20,7 @@ public class ExternalSignatureTests(TargetApiWebApplicationFactory factory) : Jw
         Client!.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
 
         // Act
-        var response = await Client.GetAsync(Factory.TargetUrl);
+        var response = await Client.GetAsync(TestSettings.CurrentTestSettings.TargetUrl);
 
         // Assert
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
@@ -34,7 +34,7 @@ public class ExternalSignatureTests(TargetApiWebApplicationFactory factory) : Jw
         Client!.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
 
         // Act
-        var response = await Client.GetAsync(Factory.TargetUrl);
+        var response = await Client.GetAsync(TestSettings.CurrentTestSettings.TargetUrl);
 
         // Assert
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
@@ -48,7 +48,7 @@ public class ExternalSignatureTests(TargetApiWebApplicationFactory factory) : Jw
         Client!.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
 
         // Act
-        var response = await Client.GetAsync(Factory.TargetUrl);
+        var response = await Client.GetAsync(TestSettings.CurrentTestSettings.TargetUrl);
 
         // Assert
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
@@ -62,7 +62,7 @@ public class ExternalSignatureTests(TargetApiWebApplicationFactory factory) : Jw
         Client!.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
 
         // Act
-        var response = await Client.GetAsync(Factory.TargetUrl);
+        var response = await Client.GetAsync(TestSettings.CurrentTestSettings.TargetUrl);
 
         // Assert
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
@@ -133,7 +133,7 @@ public class ExternalSignatureTests(TargetApiWebApplicationFactory factory) : Jw
     {
         (string keyId, SecurityKey securityKey) = TargetApiWebApplicationFactory.GetExternalSecurityKeyData(signatureAlgorithm);
 
-        header["jku"] = $"{TargetApiWebApplicationFactory.Issuer}/external-jwks?alg={signatureAlgorithm}";
+        header["jku"] = $"{TestSettings.CurrentTestSettings.Issuer}/external-jwks?alg={signatureAlgorithm}";
         header["kid"] = keyId;
 
         return SignAndReturnJwt(header, encodedPayload, signatureAlgorithm, securityKey, out headerAndPayload);
@@ -154,7 +154,7 @@ public class ExternalSignatureTests(TargetApiWebApplicationFactory factory) : Jw
     {
         (string keyId, SecurityKey securityKey) = TargetApiWebApplicationFactory.GetExternalSecurityKeyData(signatureAlgorithm);
 
-        header["x5u"] = $"{TargetApiWebApplicationFactory.Issuer}/external-cert?alg={signatureAlgorithm}";
+        header["x5u"] = $"{TestSettings.CurrentTestSettings.Issuer}/external-cert?alg={signatureAlgorithm}";
         header["kid"] = keyId;
 
         return SignAndReturnJwt(header, encodedPayload, signatureAlgorithm, securityKey, out headerAndPayload);

@@ -1,5 +1,6 @@
 ﻿using JWTGuard.Helpers;
 
+using Duende.IdentityServer.Test;
 using Microsoft.IdentityModel.Tokens;
 
 namespace JWTGuard;
@@ -9,6 +10,22 @@ namespace JWTGuard;
 /// </summary>
 public readonly struct TestSettings
 {
+    /// <summary>
+    /// Static constructor for the <see cref="TestSettings"/> struct.
+    /// </summary>
+    static TestSettings()
+    {
+        // Override the default test settings here
+        // CurrentTestSettings = DefaultTestSettings with
+        // {
+        //     Issuer = "https://localhost:5901",
+        //     AllowedIssuers = ["https://localhost:5901"],
+        //     TargetUrl = "/weatherforecast",
+        //     ValidTokenTypes = ["at+jwt"],
+        //     InvalidTokenTypes = ["none", "jwt"],
+        // };
+    }
+
     public static readonly IReadOnlyCollection<string> KnownSecurityAlgorithms =
     [
         SecurityAlgorithms.EcdsaSha256,
@@ -37,16 +54,6 @@ public readonly struct TestSettings
         SecurityAlgorithms.RsaSha384,
         SecurityAlgorithms.RsaSha512
     ];
-
-    static TestSettings()
-    {
-        // Override the default test settings here
-        //CurrentTestSettings = DefaultTestSettings with
-        //{
-        //    ValidTokenTypes = ["at+jwt"],
-        //    InvalidTokenTypes = ["none", "jwt"],
-        //};
-    }
 
     public TestSettings()
     {
@@ -112,6 +119,26 @@ public readonly struct TestSettings
     ];
 
     /// <summary>
+    /// The default target API endpoint to test. Defaults to "/weatherforecast".
+    /// </summary>
+    public string TargetUrl { get; init; } = "/weatherforecast";
+
+    /// <summary>
+    /// The default test user. Defaults to a user with subject ID "1", username "alice", and password "password".
+    /// </summary>
+    public TestUser DefaultTestUser { get; init; } = new()
+    {
+        SubjectId = "1",
+        Username = "alice",
+        Password = "password"
+    };
+
+    /// <summary>
+    /// The default audience. Defaults to "api".
+    /// </summary>
+    public string DefaultAudience { get; init; } = "api";
+
+    /// <summary>
     /// Collection of allowed audiences. Defaults to [ "api" ].
     /// </summary>
     public IReadOnlyCollection<string> AllowedAudiences { get; init; } = ["api"];
@@ -122,9 +149,14 @@ public readonly struct TestSettings
     public IReadOnlyCollection<string> DisallowedAudiences { get; init; } = ["another-api"];
 
     /// <summary>
-    /// Collection of allowed issuers. Defaults to [ <see cref="TargetApiWebApplicationFactory.Issuer" /> ].
+    /// The default issuer. Defaults to "https://localhost:5901".
     /// </summary>
-    public IReadOnlyCollection<string> AllowedIssuers { get; init; } = [TargetApiWebApplicationFactory.Issuer];
+    public string Issuer { get; init; } = "https://localhost:5901";
+
+    /// <summary>
+    /// Collection of allowed issuers. Defaults to [ "https://localhost:5901" ].
+    /// </summary>
+    public IReadOnlyCollection<string> AllowedIssuers { get; init; } = ["https://localhost:5901"];
 
     /// <summary>
     /// Collection of disallowed issuers. Defaults to [ "" ].

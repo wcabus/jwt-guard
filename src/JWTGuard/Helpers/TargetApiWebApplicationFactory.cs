@@ -3,7 +3,6 @@
 using Duende.IdentityServer.Configuration;
 using Duende.IdentityServer.Models;
 using Duende.IdentityServer.Services;
-using Duende.IdentityServer.Test;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -20,17 +19,7 @@ public class TargetApiWebApplicationFactory : WebApplicationFactory<Program>, IS
 
     private readonly JsonWebTokenHandler _tokenHandler = new();
 
-    public const string Audience = "api";
-    public const string Issuer = "https://localhost:5901";
-
     private static readonly Dictionary<string, (string KeyId, SecurityKey SecurityKey)> GeneratedSecurityKeys = new();
-
-    public static readonly TestUser DefaultTestUser = new()
-    {
-        SubjectId = "1",
-        Username = "alice",
-        Password = "password",
-    };
 
     private static readonly HttpClient HttpClient = new();
 
@@ -38,8 +27,6 @@ public class TargetApiWebApplicationFactory : WebApplicationFactory<Program>, IS
     {
         CreateAndRunIdentityProvider();
     }
-
-    public string TargetUrl => "/weatherforecast";
 
     public JwtBuilder CreateJwtBuilder() => new(this, _tokenHandler);
 
@@ -51,7 +38,7 @@ public class TargetApiWebApplicationFactory : WebApplicationFactory<Program>, IS
         }
 
         // Generate key material by requesting the discovery document.
-        await HttpClient.GetAsync($"{Issuer}/.well-known/openid-configuration");
+        await HttpClient.GetAsync($"{TestSettings.CurrentTestSettings.Issuer}/.well-known/openid-configuration");
 
         using var scope = _duendeHost.Services.CreateScope();
         var keyMaterialService = scope.ServiceProvider.GetRequiredService<IKeyMaterialService>();
@@ -66,9 +53,9 @@ public class TargetApiWebApplicationFactory : WebApplicationFactory<Program>, IS
             // Reconfigure (only) the JWT bearer options to use the test identity provider instance.
             services.Configure<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme, options =>
             {
-                options.Authority = Issuer;
-                options.Audience = Audience;
-                options.TokenValidationParameters.ValidIssuer = Issuer;
+                options.Authority = TestSettings.CurrentTestSettings.Issuer;
+                options.Audience = TestSettings.CurrentTestSettings.DefaultAudience;
+                options.TokenValidationParameters.ValidIssuer = TestSettings.CurrentTestSettings.Issuer;
             });
         });
     }
@@ -76,7 +63,7 @@ public class TargetApiWebApplicationFactory : WebApplicationFactory<Program>, IS
     private void CreateAndRunIdentityProvider()
     {
         var builder = WebApplication.CreateBuilder();
-        builder.WebHost.UseUrls(Issuer);
+        builder.WebHost.UseUrls(TestSettings.CurrentTestSettings.Issuer);
 
         builder.Services.AddAuthentication();
         builder.Services.AddAuthorization();
@@ -90,10 +77,10 @@ public class TargetApiWebApplicationFactory : WebApplicationFactory<Program>, IS
                     .ToArray();
             })
             .AddInMemoryApiScopes([
-                new ApiScope(Audience)
+                new ApiScope(TestSettings.CurrentTestSettings.DefaultAudience)
             ])
             .AddInMemoryApiResources([
-                new ApiResource(Audience) { Scopes = { Audience } }
+                new ApiResource(TestSettings.CurrentTestSettings.DefaultAudience) { Scopes = { TestSettings.CurrentTestSettings.DefaultAudience } }
 
             ])
             .AddInMemoryIdentityResources([
@@ -105,7 +92,7 @@ public class TargetApiWebApplicationFactory : WebApplicationFactory<Program>, IS
             ])
             .AddInMemoryClients(ConfigureClients())
             .AddInMemoryPersistedGrants()
-            .AddTestUsers([DefaultTestUser])
+            .AddTestUsers([TestSettings.CurrentTestSettings.DefaultTestUser])
             .AddKeyManagement();
 
         _duendeHost = builder.Build();
@@ -180,7 +167,7 @@ public class TargetApiWebApplicationFactory : WebApplicationFactory<Program>, IS
             ClientId = "m2m",
             AllowedGrantTypes = GrantTypes.ClientCredentials,
             ClientSecrets = { new Secret("secret".Sha256()) },
-            AllowedScopes = { Audience }
+            AllowedScopes = { TestSettings.CurrentTestSettings.DefaultAudience }
         };
 
         yield return new Client
@@ -189,7 +176,7 @@ public class TargetApiWebApplicationFactory : WebApplicationFactory<Program>, IS
             AllowedGrantTypes = GrantTypes.CodeAndClientCredentials,
             RequirePkce = true,
             ClientSecrets = { new Secret("secret".Sha256()) },
-            AllowedScopes = { Audience }
+            AllowedScopes = { TestSettings.CurrentTestSettings.DefaultAudience }
         };
     }
 

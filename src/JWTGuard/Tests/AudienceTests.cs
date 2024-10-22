@@ -24,7 +24,7 @@ public class AudienceTests(TargetApiWebApplicationFactory factory) : JwtGuardTes
         Client!.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
 
         // Act
-        var response = await Client.GetAsync(Factory.TargetUrl);
+        var response = await Client.GetAsync(TestSettings.CurrentTestSettings.TargetUrl);
 
         // Assert
         Assert.NotEqual(HttpStatusCode.Unauthorized, response.StatusCode);
@@ -45,7 +45,7 @@ public class AudienceTests(TargetApiWebApplicationFactory factory) : JwtGuardTes
         Client!.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
 
         // Act
-        var response = await Client.GetAsync(Factory.TargetUrl);
+        var response = await Client.GetAsync(TestSettings.CurrentTestSettings.TargetUrl);
 
         // Assert
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
