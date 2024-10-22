@@ -26,9 +26,9 @@ public class JwtBuilder
 
     public string TokenType { get; private set; } = TestSettings.CurrentTestSettings.ValidTokenTypes.FirstOrDefault() ?? "";
 
-    public string Audience { get; private set; } = TargetApiWebApplicationFactory.Audience;
+    public string Audience { get; private set; } = TestSettings.CurrentTestSettings.DefaultAudience;
 
-    public string Issuer { get; private set; } = TargetApiWebApplicationFactory.Issuer;
+    public string Issuer { get; private set; } = TestSettings.CurrentTestSettings.Issuer;
 
     public SigningCredentials? SigningCredentials { get; private set; }
     public string? SignatureAlgorithm { get; private set; }
@@ -39,9 +39,9 @@ public class JwtBuilder
     public DateTime Expires { get; private set; } = DateTime.UtcNow.AddMinutes(5);
 
     public ClaimsIdentity? Subject { get; private set; } = new([
-        new Claim(JwtClaimTypes.Subject, TargetApiWebApplicationFactory.DefaultTestUser.SubjectId),
-        new Claim(JwtClaimTypes.Name, TargetApiWebApplicationFactory.DefaultTestUser.Username),
-        new Claim(JwtClaimTypes.PreferredUserName, TargetApiWebApplicationFactory.DefaultTestUser.Username)
+        new Claim(JwtClaimTypes.Subject, TestSettings.CurrentTestSettings.DefaultTestUser.SubjectId),
+        new Claim(JwtClaimTypes.Name, TestSettings.CurrentTestSettings.DefaultTestUser.Username),
+        new Claim(JwtClaimTypes.PreferredUserName, TestSettings.CurrentTestSettings.DefaultTestUser.Username)
     ]);
 
     public JwtBuilder WithTokenType(string tokenType)

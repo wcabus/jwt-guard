@@ -1,0 +1,47 @@
+name: Publish NuGet package
+
+on:
+  push:
+    tags:
+      - v*
+
+env:
+    PROJECT_FOLDER: ./src
+    PROJECT: JWTGuard.Template.csproj
+    NUPKG: JWTGuard.Template.nupkg
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        dotnet-version: [ '8.0.x' ]
+
+    steps:
+    - uses: actions/checkout@v4
+            
+    - name: Setup .NET ${{ matrix.dotnet-version }}
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ matrix.dotnet-version }}
+
+    - name: Install Dependencies
+      run: dotnet restore $PROJECT_FOLDER/$PROJECT
+      env:
+        DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+
+    - name: Build Project
+      run: dotnet build $PROJECT_FOLDER/$PROJECT -c Release
+      env:
+        DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+
+    - name: Pack
+      run: dotnet pack $PROJECT_FOLDER/$PROJECT -c Release --no-build --output ./artifacts
+      env:
+        DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+
+    - name: Push
+      run: dotnet nuget push ./artifacts/$NUPKG -k $PUSH_API_KEY -s https://api.nuget.org/v3/index.json --skip-duplicate --no-symbols
+      env:
+        DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+        PUSH_API_KEY: ${{ secrets.NUGET_API_KEY }}
