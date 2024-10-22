@@ -2,24 +2,51 @@
     "$schema": "http://json.schemastore.org/template",
     "author": "Wesley Cabus",
     "classifications": [
-        "Test", 
-        "xUnit", 
-        "API", 
-        "Web", 
-        "Web API", 
-        "WebAPI", 
-        "Security", 
+        "Test",
+        "xUnit",
+        "API",
+        "Web",
+        "Web API",
+        "WebAPI",
+        "Security",
         "JWT"
     ],
-    "identity": "JWTGuard",
+    "identity": "JWT Guard",
     "name": "JWT Guard Test Suite",
     "shortName": "jwt-guard",
     "sourceName": "JWTGuard",
     "preferNameDirectory": true,
+    "primaryOutputs": [
+        {
+            "path": "JWTGuard.csproj"
+        }
+    ],
+    "description": "JWT Guard is a free, open source, test suite written in C# for testing the security of JSON Web Token (JWT) implementations.",
     "tags": {
         "language": "C#",
         "type": "project"
     },
+    "sources": [
+        {
+            "source": "./",
+            "target": "./",
+            "exclude": [
+                "**/.vs/**",
+                "**/*.log",
+                ".git/**",
+                ".template.config/**",
+                "**/bin/**",
+                "**/Bin/**",
+                "**/obj/**",
+                "**/Obj/**",
+                "**/Properties/**",
+                "**/properties/**",
+                "**/*.lock",
+                "**/*lock.json",
+                "**/*.user"
+            ]
+        }
+    ],
     "symbols": {
         "apiProject": {
             "type": "parameter",

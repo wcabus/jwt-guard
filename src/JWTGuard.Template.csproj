@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.Net.Sdk">
+
+  <PropertyGroup>
+    <PackageType>Template</PackageType>
+    <PackageVersion>1.0.0</PackageVersion>
+    <PackageId>JWTGuard.Template</PackageId>
+    <Title>JWT Guard Test Suite</Title>
+    <Authors>Wesley Cabus</Authors>
+    <Description>JWT Guard is a free, open source, test suite written in C# for testing the security of JSON Web Token (JWT) implementations. It is designed to be used primarily by developers to test if their ASP.NET Core Web API's are properly validating JWT access tokens.</Description>
+    <PackageTags>test;xunit;api;webapi;web api;security;jwt;token;tokens;access token;access tokens</PackageTags>
+    <Copyright>Copyright (c) Wesley Cabus 2024</Copyright>
+    <PackageProjectUrl>https://jwtguard.net/</PackageProjectUrl>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/wcabus/jwt-guard</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <TargetFramework>net8.0</TargetFramework>
+    
+    <IncludeContentInPack>true</IncludeContentInPack>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <ContentTargetFolders>content</ContentTargetFolders>
+  </PropertyGroup>
+
+  <ItemGroup>  
+    <Content Include="JWTGuard\**\*" Exclude="JWTGuard\**\bin\**;JWTGuard\**\obj\**;JWTGuard\**\Properties\**" />
+    <Compile Remove="**\*" />
+    <None Include="icon.png" Pack="true" PackagePath="\" />
+    <None Include="..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+</Project>
