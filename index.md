@@ -6,7 +6,7 @@ nav_order: 1
 
 # JWT Guard
 
-JWT Guard is a free, open source, test suite written in C# for testing the security of JSON Web Token (JWT) implementations. It is designed to be used primarily by developers to test if their ASP.NET Core Web API's are properly validating JWT access tokens.
+JWT Guard is a free, open source, test suite written in C# for testing the security of JSON Web Token (JWT) implementations. It is designed to be used primarily by developers to test if their ASP.NET Core Web APIs are properly validating JWT access tokens.
 
 ## Getting started
 
@@ -37,9 +37,9 @@ Before you can run the JWT Guard test suite, you'll most likely need to update s
 
 ### 1. Configuring the target API testing endpoint
 
-JWT Guard needs to perform its tests against a secured API endpoint to verify the functionality of the JWT Bearer token middleware used by ASP.NET Core. By default, it is configured to connect to an API at `https://localhost:5901` and to use the API endpoint `/weatherforecast`, but you can very easily override these settings by going into the `TestSettings.cs` file.
+JWT Guard needs to perform its tests against a secured API endpoint to verify the functionality of the JWT Bearer token middleware used by ASP.NET Core. By default, it is configured use the API endpoint `/weatherforecast`, but you can very easily override this setting by going into the `TestSettings.cs` file.
 
-At the top of the file, you can override the default test settings in the static constructor. For example, if your local API runs on port 8888 and the target endpoint lives at `/your-secure-api-endpoint`, your configuration would look like this:
+At the top of the file, you can override the default test settings in the static constructor. For example, if target endpoint in your API is `/your-secure-api-endpoint`, your configuration would look like this:
 
 ```csharp
 public readonly struct TestSettings
@@ -52,8 +52,6 @@ public readonly struct TestSettings
         // Override the default test settings here
         CurrentTestSettings = DefaultTestSettings with
         {
-            Issuer = "https://localhost:8888",
-            AllowedIssuers = ["https://localhost:8888"],
             TargetUrl = "/your-secure-api-endpoint"
         };
     }
@@ -61,6 +59,8 @@ public readonly struct TestSettings
     // ... the rest remains as-is.
 }
 ```
+
+More information about the different test settings can be found at [Test Settings]({% link docs/test-settings.md %}).
 
 ### 2. Make your API project compatible with the JWT Guard test project
 

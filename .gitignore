@@ -39,3 +39,5 @@ bld/
 *.user
 *.userosscache
 *.sln.docstates
+
+.idea/

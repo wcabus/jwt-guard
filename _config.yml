@@ -1,5 +1,5 @@
 title: JWT Guard
-description: A starter template for a Jeykll site using the Just the Docs theme!
+description: JWT Guard is a free, open source, test suite written in C# for testing the security of JSON Web Token (JWT) implementations.
 theme: just-the-docs
 logo: "images/logo.png"
 
