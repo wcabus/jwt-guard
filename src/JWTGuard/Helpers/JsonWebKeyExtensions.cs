@@ -4,6 +4,10 @@ namespace JWTGuard.Helpers;
 
 internal static class JsonWebKeyExtensions
 {
+    /// <summary>
+    /// Converts the given <paramref name="jwk"/> into a <see cref="IDictionary{TKey,TValue}"/> to serialize its properties into JSON.
+    /// </summary>
+    /// <param name="jwk">A <see cref="JsonWebKey"/></param>
     public static IDictionary<string, object?> ToDictionary(this JsonWebKey jwk)
     {
         var dictionary = new Dictionary<string, object?>();

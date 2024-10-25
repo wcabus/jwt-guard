@@ -12,6 +12,15 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace JWTGuard.Helpers;
 
+/// <summary>
+/// Factory for bootstrapping your target Web API so that JWT Guard can run integration tests against it.
+/// </summary>
+/// <remarks>
+/// If this class fails to compile, check that your Web API project has a Program class defined and has a reference to Microsoft.AspNetCore.Authentication.JwtBearer. <br/>
+/// <br/>
+/// If you're using top-level statements in your project, add this code at the bottom of your Program.cs file: <br/>
+/// <code>public partial class Program {}</code>
+/// </remarks>
 public class TargetApiWebApplicationFactory : WebApplicationFactory<Program>, ISigningCredentialsProvider
 {
     private WebApplication? _duendeHost;
@@ -23,13 +32,22 @@ public class TargetApiWebApplicationFactory : WebApplicationFactory<Program>, IS
 
     private static readonly HttpClient HttpClient = new();
 
+    /// <summary>
+    /// Constructor of the factory class.
+    /// </summary>
     public TargetApiWebApplicationFactory()
     {
         CreateAndRunIdentityProvider();
     }
 
+    /// <summary>
+    /// Creates a new instance of <see cref="JwtBuilder"/> and returns it.
+    /// </summary>
     public JwtBuilder CreateJwtBuilder() => new(this, _tokenHandler);
 
+    /// <summary>
+    /// Returns the <see cref="SigningCredentials"/> from the local issuer instance.
+    /// </summary>
     async Task<SigningCredentials> ISigningCredentialsProvider.GetSigningCredentialsAsync(string algorithm)
     {
         if (_duendeHost is null)
@@ -46,6 +64,13 @@ public class TargetApiWebApplicationFactory : WebApplicationFactory<Program>, IS
         return await keyMaterialService.GetSigningCredentialsAsync([algorithm]);
     }
 
+    /// <summary>
+    /// Configures the target Web API's host.
+    /// </summary>
+    /// <remarks>
+    /// Some of the authentication settings need to be overwritten for JWT Guard to function correctly.<br/>
+    /// Other settings, like the supported signature algorithms or expected token types, remain unchanged.
+    /// </remarks>
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.ConfigureTestServices(services =>
@@ -60,6 +85,12 @@ public class TargetApiWebApplicationFactory : WebApplicationFactory<Program>, IS
         });
     }
 
+    /// <summary>
+    /// Creates and runs a local identity provider instance.
+    /// </summary>
+    /// <remarks>
+    /// During the test runs, JWT Guard spins up its own issuer using Duende IdentityServer. This allows JWT Guard to have full control over the issued tokens in order to influence them during the tests.
+    /// </remarks>
     private void CreateAndRunIdentityProvider()
     {
         var builder = WebApplication.CreateBuilder();
@@ -146,6 +177,9 @@ public class TargetApiWebApplicationFactory : WebApplicationFactory<Program>, IS
         _duendeHost.RunAsync(_duendeHostCancellationSource.Token);
     }
 
+    /// <summary>
+    /// Retrieves "external" security key information to test tokens containing a "x5u" or "jku" claim.
+    /// </summary>
     public static (string KeyId, SecurityKey SecurityKey) GetExternalSecurityKeyData(string signatureAlgorithm)
     {
         if (GeneratedSecurityKeys.TryGetValue(signatureAlgorithm!, out var securityKeyData))
@@ -180,12 +214,20 @@ public class TargetApiWebApplicationFactory : WebApplicationFactory<Program>, IS
         };
     }
 
+    /// <summary>
+    /// Disposes the local Duende IdentityServer instance.
+    /// </summary>
     protected override void Dispose(bool disposing)
     {
         if (disposing)
         {
             _duendeHostCancellationSource?.Cancel();
-            _duendeHost?.DisposeAsync().GetAwaiter().GetResult();
+            
+            var task = _duendeHost?.DisposeAsync();
+            if (task is not null && !task.Value.IsCompleted)
+            {
+                task.Value.GetAwaiter().GetResult();
+            }
         }
 
         base.Dispose(disposing);

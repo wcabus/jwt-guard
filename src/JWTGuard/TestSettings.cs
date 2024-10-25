@@ -22,6 +22,9 @@ public readonly struct TestSettings
         // };
     }
 
+    /// <summary>
+    /// List of known security algorithms. These are the ones JWT Guard can use to sign JWT tokens.
+    /// </summary>
     public static readonly IReadOnlyCollection<string> KnownSecurityAlgorithms =
     [
         SecurityAlgorithms.EcdsaSha256,
@@ -38,6 +41,9 @@ public readonly struct TestSettings
         SecurityAlgorithms.RsaSha512
     ];
 
+    /// <summary>
+    /// List of security algorithms that are supported by Duende IdentityServer.
+    /// </summary>
     public static readonly IReadOnlyCollection<string> DuendeSupportedSecurityAlgorithms =
     [
         SecurityAlgorithms.EcdsaSha256,
@@ -51,6 +57,9 @@ public readonly struct TestSettings
         SecurityAlgorithms.RsaSha512
     ];
 
+    /// <summary>
+    /// Default constructor.
+    /// </summary>
     public TestSettings()
     {
     }

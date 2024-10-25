@@ -7,11 +7,14 @@ using Xunit;
 
 namespace JWTGuard.Tests;
 
+/// <summary>
+/// Test class to test the audience ("aud") claim in JWTs.
+/// </summary>
 public class AudienceTests(TargetApiWebApplicationFactory factory) : JwtGuardTestBase(factory)
 {
     [Theory(DisplayName = "When a token uses allowed values for the audience claim, the API should not return a 401 Unauthorized response.")]
     [MemberData(nameof(GetAllowedAudiences))]
-    public async Task Accessing_AuthorizedUrl_Is_Authorized_For_Allowed_Audiences(string? audience)
+    internal async Task Accessing_AuthorizedUrl_Is_Authorized_For_Allowed_Audiences(string? audience)
     {
         if (audience is null)
         {
@@ -32,7 +35,7 @@ public class AudienceTests(TargetApiWebApplicationFactory factory) : JwtGuardTes
 
     [Theory(DisplayName = "When a token uses disallowed values for the audience claim, the API should return a 401 Unauthorized response.")]
     [MemberData(nameof(GetDisallowedAudiences))]
-    public async Task Accessing_AuthorizedUrl_Is_Unauthorized_For_Disallowed_Audiences(string? audience)
+    internal async Task Accessing_AuthorizedUrl_Is_Unauthorized_For_Disallowed_Audiences(string? audience)
     {
         if (audience is null)
         {
@@ -58,6 +61,9 @@ public class AudienceTests(TargetApiWebApplicationFactory factory) : JwtGuardTes
             .BuildAsync();
     }
 
+    /// <summary>
+    /// Retrieves the allowed audiences for our test theories.
+    /// </summary>
     public static TheoryData<string?> GetAllowedAudiences()
     {
         return TestSettings.CurrentTestSettings.AllowedAudiences.Count == 0
@@ -65,6 +71,9 @@ public class AudienceTests(TargetApiWebApplicationFactory factory) : JwtGuardTes
             : new TheoryData<string?>(TestSettings.CurrentTestSettings.AllowedAudiences);
     }
 
+    /// <summary>
+    /// Retrieves the disallowed audiences for our test theories.
+    /// </summary>
     public static TheoryData<string?> GetDisallowedAudiences()
     {
         return TestSettings.CurrentTestSettings.DisallowedAudiences.Count == 0

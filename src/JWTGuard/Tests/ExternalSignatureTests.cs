@@ -10,10 +10,13 @@ using JWTGuard.Helpers;
 
 namespace JWTGuard.Tests;
 
+/// <summary>
+/// Test class to test signed JWTs which use external signature material.
+/// </summary>
 public class ExternalSignatureTests(TargetApiWebApplicationFactory factory) : JwtGuardTestBase(factory)
 {
     [Fact(DisplayName = "When using an external JSON Web Key by specifying the 'jku' and 'kid' claims in the token, the API should return a 401 Unauthorized response.")]
-    public async Task Accessing_AuthorizedUrl_Is_Unauthorized_For_External_WebKey_Using_jku_Claim()
+    internal async Task Accessing_AuthorizedUrl_Is_Unauthorized_For_External_WebKey_Using_jku_Claim()
     {
         // Arrange
         var jwt = GetJwt(ExternalSignatureTestCase.UseJkuAndKidClaims);
@@ -27,7 +30,7 @@ public class ExternalSignatureTests(TargetApiWebApplicationFactory factory) : Jw
     }
 
     [Fact(DisplayName = "When using an external JSON Web Key by specifying the 'jwk' claim in the token, the API should return a 401 Unauthorized response.")]
-    public async Task Accessing_AuthorizedUrl_Is_Unauthorized_For_External_WebKey_Using_jwk_Claim()
+    internal async Task Accessing_AuthorizedUrl_Is_Unauthorized_For_External_WebKey_Using_jwk_Claim()
     {
         // Arrange
         var jwt = GetJwt(ExternalSignatureTestCase.UseJwkClaim);
@@ -41,7 +44,7 @@ public class ExternalSignatureTests(TargetApiWebApplicationFactory factory) : Jw
     }
 
     [Fact(DisplayName = "When using an external certificate by specifying the 'x5u' claim in the token, the API should return a 401 Unauthorized response.")]
-    public async Task Accessing_AuthorizedUrl_Is_Unauthorized_For_External_Certificate_Using_x5u_Claim()
+    internal async Task Accessing_AuthorizedUrl_Is_Unauthorized_For_External_Certificate_Using_x5u_Claim()
     {
         // Arrange
         var jwt = GetJwt(ExternalSignatureTestCase.UseX5uClaim);
@@ -55,7 +58,7 @@ public class ExternalSignatureTests(TargetApiWebApplicationFactory factory) : Jw
     }
 
     [Fact(DisplayName = "When using an external certificate by specifying the 'x5c' claim in the token, the API should return a 401 Unauthorized response.")]
-    public async Task Accessing_AuthorizedUrl_Is_Unauthorized_For_External_Certificate_Using_x5c_Claim()
+    internal async Task Accessing_AuthorizedUrl_Is_Unauthorized_For_External_Certificate_Using_x5c_Claim()
     {
         // Arrange
         var jwt = GetJwt(ExternalSignatureTestCase.UseX5cClaim);

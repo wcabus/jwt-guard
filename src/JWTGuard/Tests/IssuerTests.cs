@@ -7,11 +7,14 @@ using Xunit;
 
 namespace JWTGuard.Tests;
 
+/// <summary>
+/// Test class to test the issuer ("iss") claim in JWTs.
+/// </summary>
 public class IssuerTests(TargetApiWebApplicationFactory factory) : JwtGuardTestBase(factory)
 {
     [Theory(DisplayName = "When a token uses allowed values for the issuer claim, the API should not return a 401 Unauthorized response.")]
     [MemberData(nameof(GetAllowedIssuers))]
-    public async Task Accessing_AuthorizedUrl_Is_Authorized_For_Allowed_Issuer(string? issuer)
+    internal async Task Accessing_AuthorizedUrl_Is_Authorized_For_Allowed_Issuer(string? issuer)
     {
         if (issuer is null)
         {
@@ -32,7 +35,7 @@ public class IssuerTests(TargetApiWebApplicationFactory factory) : JwtGuardTestB
 
     [Theory(DisplayName = "When a token uses disallowed values for the issuer claim, the API should return a 401 Unauthorized response.")]
     [MemberData(nameof(GetDisallowedIssuers))]
-    public async Task Accessing_AuthorizedUrl_Is_Unauthorized_For_Disallowed_Issuers(string? issuer)
+    internal async Task Accessing_AuthorizedUrl_Is_Unauthorized_For_Disallowed_Issuers(string? issuer)
     {
         if (issuer is null)
         {
@@ -58,6 +61,9 @@ public class IssuerTests(TargetApiWebApplicationFactory factory) : JwtGuardTestB
             .BuildAsync();
     }
 
+    /// <summary>
+    /// Retrieves the allowed issuers for our test theories.
+    /// </summary>
     public static TheoryData<string?> GetAllowedIssuers()
     {
         return TestSettings.CurrentTestSettings.AllowedIssuers.Count == 0
@@ -65,6 +71,9 @@ public class IssuerTests(TargetApiWebApplicationFactory factory) : JwtGuardTestB
             : new TheoryData<string?>(TestSettings.CurrentTestSettings.AllowedIssuers);
     }
 
+    /// <summary>
+    /// Retrieves the disallowed issuers for our test theories.
+    /// </summary>
     public static TheoryData<string?> GetDisallowedIssuers()
     {
         return TestSettings.CurrentTestSettings.DisallowedIssuers.Count == 0
