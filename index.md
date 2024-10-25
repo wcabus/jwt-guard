@@ -2,6 +2,7 @@
 title: JWT Guard
 layout: home
 nav_order: 1
+permalink: /
 ---
 
 # JWT Guard
@@ -60,7 +61,7 @@ public readonly struct TestSettings
 }
 ```
 
-More information about the different test settings can be found at [Test Settings]({% link docs/test-settings.md %}).
+More information about the different test settings can be found at [Test Settings]({% link test-settings.md %}).
 
 ### 2. Make your API project compatible with the JWT Guard test project
 

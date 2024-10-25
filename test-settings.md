@@ -1,25 +1,20 @@
-﻿---
+---
 title: Test Settings
 nav_order: 2
+layout: page
+permalink: /test-settings
 ---
 
 # Test Settings
-{: .no_toc }
-
-## Table of Contents
-{: .no_toc .text-delta }
-
-1. TOC
-{:toc}
 
 Using the `TestSettings.cs` file, you can configure the following aspects within the JWT Guard test suite:
 
-1. The target URL used to run every test against.
-2. The default test user used to generate an access token for.
-3. The default, allowed and disallowed audiences.
-4. The default, allowed and disallowed issuers.
-5. The default, allowed and disallowed signature algorithms.
-6. And which token types are valid or invalid.
+1. [The target URL used to run every test against.](#target-url)
+2. [The default test user used to generate an access token for.](#default-test-user)
+3. [The default, allowed and disallowed audiences.](#audience)
+4. [The default, allowed and disallowed issuers.](#issuer)
+5. [The default, allowed and disallowed signature algorithms.](#signature-algorithms)
+6. [And which token types are valid or invalid.](#token-types)
 
 Let's go over each of these configuration aspects in more detail.
 
@@ -72,7 +67,7 @@ The `kid` will match one of the keys known by the token issuer service, and your
 
 If your Web API allows any of these valid JWS properties to be used when validating the token signature, anyone would be able to create valid access tokens!
 
-## Token type
+## Token types
 
 The header of a token typically contains the `typ` header with the value `JWT` for JSON Web Tokens. Some token issuers use a more specific type for the different token types, and use, for example, the value `at+jwt` for an access token.
 
