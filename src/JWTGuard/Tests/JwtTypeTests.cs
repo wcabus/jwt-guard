@@ -7,11 +7,14 @@ using Xunit;
 
 namespace JWTGuard.Tests;
 
+/// <summary>
+/// Test class to test the token type ("typ") claim in JWTs.
+/// </summary>
 public class JwtTypeTests(TargetApiWebApplicationFactory factory) : JwtGuardTestBase(factory)
 {
     [Theory(DisplayName = "When a token uses an expected token type, the API should not return a 401 Unauthorized response.")]
     [MemberData(nameof(GetValidJwtTypes))]
-    public async Task Accessing_AuthorizedUrl_Is_Authorized_For_Valid_JWT_Types(string? tokenType)
+    internal async Task Accessing_AuthorizedUrl_Is_Authorized_For_Valid_JWT_Types(string? tokenType)
     {
         if (tokenType is null)
         {
@@ -32,7 +35,7 @@ public class JwtTypeTests(TargetApiWebApplicationFactory factory) : JwtGuardTest
 
     [Theory(DisplayName = "When a token uses an unexpected token type, the API should return a 401 Unauthorized response.")]
     [MemberData(nameof(GetInvalidJwtTypes))]
-    public async Task Accessing_AuthorizedUrl_Is_Unauthorized_For_Invalid_JWT_Types(string? tokenType)
+    internal async Task Accessing_AuthorizedUrl_Is_Unauthorized_For_Invalid_JWT_Types(string? tokenType)
     {
         if (tokenType is null)
         {
@@ -58,6 +61,9 @@ public class JwtTypeTests(TargetApiWebApplicationFactory factory) : JwtGuardTest
             .BuildAsync();
     }
 
+    /// <summary>
+    /// Retrieves the valid token types for our test theories.
+    /// </summary>
     public static TheoryData<string?> GetValidJwtTypes()
     {
         return TestSettings.CurrentTestSettings.ValidTokenTypes.Count == 0
@@ -65,6 +71,9 @@ public class JwtTypeTests(TargetApiWebApplicationFactory factory) : JwtGuardTest
             : new TheoryData<string?>(TestSettings.CurrentTestSettings.ValidTokenTypes);
     }
 
+    /// <summary>
+    /// Retrieves the invalid token types for our test theories.
+    /// </summary>
     public static TheoryData<string?> GetInvalidJwtTypes()
     {
         return TestSettings.CurrentTestSettings.InvalidTokenTypes.Count == 0 

@@ -7,11 +7,14 @@ using Xunit;
 
 namespace JWTGuard.Tests;
 
+/// <summary>
+/// Test class to test the signature algorithm ("alg") claim in JWTs.
+/// </summary>
 public class SignatureAlgorithmTests(TargetApiWebApplicationFactory factory) : JwtGuardTestBase(factory)
 {
     [Theory(DisplayName = "When a token uses a supported signature algorithm, the API should not return a 401 Unauthorized response.")]
-    [MemberData(nameof(GetSupportedAlgorithms))]
-    public async Task Accessing_AuthorizedUrl_Is_Authorized_For_Supported_Signature_Algorithms(string? signatureAlgorithm)
+    [MemberData(nameof(GetAllowedAlgorithms))]
+    internal async Task Accessing_AuthorizedUrl_Is_Authorized_For_Supported_Signature_Algorithms(string? signatureAlgorithm)
     {
         if (signatureAlgorithm is null)
         {
@@ -31,8 +34,8 @@ public class SignatureAlgorithmTests(TargetApiWebApplicationFactory factory) : J
     }
 
     [Theory(DisplayName = "When a token uses an unsupported signature algorithm, the API should return a 401 Unauthorized response.")]
-    [MemberData(nameof(GetUnsupportedAlgorithms))]
-    public async Task Accessing_AuthorizedUrl_Is_Unauthorized_For_Unsupported_Signature_Algorithms(string? signatureAlgorithm)
+    [MemberData(nameof(GetDisllowedAlgorithms))]
+    internal async Task Accessing_AuthorizedUrl_Is_Unauthorized_For_Unsupported_Signature_Algorithms(string? signatureAlgorithm)
     {
         if (signatureAlgorithm is null)
         {
@@ -58,17 +61,23 @@ public class SignatureAlgorithmTests(TargetApiWebApplicationFactory factory) : J
             .BuildAsync();
     }
 
-    public static TheoryData<string?> GetSupportedAlgorithms()
+    /// <summary>
+    /// Retrieves the allowed signature algorithms for our test theories.
+    /// </summary>
+    public static TheoryData<string?> GetAllowedAlgorithms()
     {
-        return TestSettings.CurrentTestSettings.SupportedAlgorithms.Count == 0
+        return TestSettings.CurrentTestSettings.AllowedAlgorithms.Count == 0
             ? new TheoryData<string?>([null])
-            : new TheoryData<string?>(TestSettings.CurrentTestSettings.SupportedAlgorithms);
+            : new TheoryData<string?>(TestSettings.CurrentTestSettings.AllowedAlgorithms);
     }
 
-    public static TheoryData<string?> GetUnsupportedAlgorithms()
+    /// <summary>
+    /// Retrieves the disallowed signature algorithms for our test theories.
+    /// </summary>
+    public static TheoryData<string?> GetDisllowedAlgorithms()
     {
-        return TestSettings.CurrentTestSettings.UnsupportedAlgorithms.Count == 0
+        return TestSettings.CurrentTestSettings.DisallowedAlgorithms.Count == 0
             ? new TheoryData<string?>([null])
-            : new TheoryData<string?>(TestSettings.CurrentTestSettings.UnsupportedAlgorithms);
+            : new TheoryData<string?>(TestSettings.CurrentTestSettings.DisallowedAlgorithms);
     }
 }

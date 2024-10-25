@@ -3,8 +3,15 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace JWTGuard.Helpers;
 
+/// <summary>
+/// Utility class to build <see cref="SecurityKey"/>s.
+/// </summary>
 public static class SecurityKeyBuilder
 {
+    /// <summary>
+    /// Create a new <see cref="SecurityKey"/> for the specified <paramref name="signatureAlgorithm"/>.
+    /// </summary>
+    /// <param name="signatureAlgorithm">A valid signature algorithm. See <see cref="SecurityAlgorithms"/>.</param>
     public static SecurityKey CreateSecurityKey(string signatureAlgorithm)
     {
         if (!signatureAlgorithm.StartsWith("ES"))
@@ -23,6 +30,12 @@ public static class SecurityKeyBuilder
         return CryptoHelper.CreateECDsaSecurityKey(curve);
     }
 
+    /// <summary>
+    /// Returns the public key data for the given <paramref name="securityKey"/>.
+    /// </summary>
+    /// <param name="securityKey">A <see cref="SecurityKey"/></param>
+    /// <returns></returns>
+    /// <exception cref="NotImplementedException">Thrown if this method is being called for a security key which is not an instance of either <see cref="RsaSecurityKey"/> or <see cref="ECDsaSecurityKey"/>.</exception>
     public static string GetCertificatePublicKeyPem(SecurityKey securityKey)
     {
         switch (securityKey)
