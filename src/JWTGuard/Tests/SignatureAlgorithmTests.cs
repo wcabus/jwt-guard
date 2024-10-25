@@ -60,15 +60,15 @@ public class SignatureAlgorithmTests(TargetApiWebApplicationFactory factory) : J
 
     public static TheoryData<string?> GetSupportedAlgorithms()
     {
-        return TestSettings.CurrentTestSettings.SupportedAlgorithms.Count == 0
+        return TestSettings.CurrentTestSettings.AllowedAlgorithms.Count == 0
             ? new TheoryData<string?>([null])
-            : new TheoryData<string?>(TestSettings.CurrentTestSettings.SupportedAlgorithms);
+            : new TheoryData<string?>(TestSettings.CurrentTestSettings.AllowedAlgorithms);
     }
 
     public static TheoryData<string?> GetUnsupportedAlgorithms()
     {
-        return TestSettings.CurrentTestSettings.UnsupportedAlgorithms.Count == 0
+        return TestSettings.CurrentTestSettings.DisallowedAlgorithms.Count == 0
             ? new TheoryData<string?>([null])
-            : new TheoryData<string?>(TestSettings.CurrentTestSettings.UnsupportedAlgorithms);
+            : new TheoryData<string?>(TestSettings.CurrentTestSettings.DisallowedAlgorithms);
     }
 }

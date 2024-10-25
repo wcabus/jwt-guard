@@ -28,7 +28,7 @@ public class JwtBuilder
 
     public string Audience { get; private set; } = TestSettings.CurrentTestSettings.DefaultAudience;
 
-    public string Issuer { get; private set; } = TestSettings.CurrentTestSettings.Issuer;
+    public string Issuer { get; private set; } = TestSettings.CurrentTestSettings.DefaultIssuer;
 
     public SigningCredentials? SigningCredentials { get; private set; }
     public string? SignatureAlgorithm { get; private set; }

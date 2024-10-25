@@ -38,7 +38,7 @@ public class TargetApiWebApplicationFactory : WebApplicationFactory<Program>, IS
         }
 
         // Generate key material by requesting the discovery document.
-        await HttpClient.GetAsync($"{TestSettings.CurrentTestSettings.Issuer}/.well-known/openid-configuration");
+        await HttpClient.GetAsync($"{TestSettings.CurrentTestSettings.DefaultIssuer}/.well-known/openid-configuration");
 
         using var scope = _duendeHost.Services.CreateScope();
         var keyMaterialService = scope.ServiceProvider.GetRequiredService<IKeyMaterialService>();
@@ -53,9 +53,9 @@ public class TargetApiWebApplicationFactory : WebApplicationFactory<Program>, IS
             // Reconfigure (only) the JWT bearer options to use the test identity provider instance.
             services.Configure<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme, options =>
             {
-                options.Authority = TestSettings.CurrentTestSettings.Issuer;
+                options.Authority = TestSettings.CurrentTestSettings.DefaultIssuer;
                 options.Audience = TestSettings.CurrentTestSettings.DefaultAudience;
-                options.TokenValidationParameters.ValidIssuer = TestSettings.CurrentTestSettings.Issuer;
+                options.TokenValidationParameters.ValidIssuer = TestSettings.CurrentTestSettings.DefaultIssuer;
             });
         });
     }
@@ -63,7 +63,7 @@ public class TargetApiWebApplicationFactory : WebApplicationFactory<Program>, IS
     private void CreateAndRunIdentityProvider()
     {
         var builder = WebApplication.CreateBuilder();
-        builder.WebHost.UseUrls(TestSettings.CurrentTestSettings.Issuer);
+        builder.WebHost.UseUrls(TestSettings.CurrentTestSettings.DefaultIssuer);
 
         builder.Services.AddAuthentication();
         builder.Services.AddAuthorization();

@@ -71,7 +71,7 @@ public class ExternalSignatureTests(TargetApiWebApplicationFactory factory) : Jw
     private string GetJwt(ExternalSignatureTestCase testCase)
     {
         // Use one of the supported signature algorithms that also supports using a certificate.
-        var signatureAlgorithm = TestSettings.CurrentTestSettings.SupportedAlgorithms
+        var signatureAlgorithm = TestSettings.CurrentTestSettings.AllowedAlgorithms
             .Where(x => x.StartsWith("ES") || x.StartsWith("PS") || x.StartsWith("RS"))
             .MinBy(_ => Random.Shared.Next()); // Takes the first result at random
 
@@ -133,7 +133,7 @@ public class ExternalSignatureTests(TargetApiWebApplicationFactory factory) : Jw
     {
         (string keyId, SecurityKey securityKey) = TargetApiWebApplicationFactory.GetExternalSecurityKeyData(signatureAlgorithm);
 
-        header["jku"] = $"{TestSettings.CurrentTestSettings.Issuer}/external-jwks?alg={signatureAlgorithm}";
+        header["jku"] = $"{TestSettings.CurrentTestSettings.DefaultIssuer}/external-jwks?alg={signatureAlgorithm}";
         header["kid"] = keyId;
 
         return SignAndReturnJwt(header, encodedPayload, signatureAlgorithm, securityKey, out headerAndPayload);
@@ -154,7 +154,7 @@ public class ExternalSignatureTests(TargetApiWebApplicationFactory factory) : Jw
     {
         (string keyId, SecurityKey securityKey) = TargetApiWebApplicationFactory.GetExternalSecurityKeyData(signatureAlgorithm);
 
-        header["x5u"] = $"{TestSettings.CurrentTestSettings.Issuer}/external-cert?alg={signatureAlgorithm}";
+        header["x5u"] = $"{TestSettings.CurrentTestSettings.DefaultIssuer}/external-cert?alg={signatureAlgorithm}";
         header["kid"] = keyId;
 
         return SignAndReturnJwt(header, encodedPayload, signatureAlgorithm, securityKey, out headerAndPayload);
