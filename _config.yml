@@ -44,6 +44,23 @@ exclude:
 
 highlight_theme: jellybeans
 
+callouts_level: quiet # or loud
+callouts:
+  highlight:
+    color: yellow
+  important:
+    title: Important
+    color: blue
+  new:
+    title: New
+    color: green
+  note:
+    title: Note
+    color: purple
+  warning:
+    title: Warning
+    color: red
+
 search_enabled: true
 search:
   # Split pages into sections that can be searched individually
