@@ -8,7 +8,7 @@ on:
 env:
     PROJECT_FOLDER: ./src
     PROJECT: JWTGuard.Template.csproj
-    NUPKG: JWTGuard.Template.nupkg
+    NUPKG: JWTGuard.Template.*.nupkg
 
 jobs:
   build:
