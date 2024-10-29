@@ -38,17 +38,21 @@ The easiest way to fix this issue, is to open the JWT Guard project's `.csproj` 
 Then, reload the solution in Visual Studio, Rider or another IDE, and add your Web API project to the JWT Guard project
 as a reference again.
 
+
 #### Visual Studio instructions
 
 In Visual Studio, you can simply drag your Web API project in the Solution Explorer window and drop it on the
-JWT Guard project node to add the missing project reference. You can also right-click the JWT Guard project and
-choose the context menu item _Add > Project Reference..._, followed by selecting your Web API project. 
+JWT Guard project node to add the missing project reference. 
+
+You can also right-click the JWT Guard project and
+choose the context menu item _Add > Project Reference..._, followed by selecting your Web API project.
 Click the OK button to confirm.
+
 
 #### Rider instructions
 
-In Rider, right-click on the JWT Guard project node and choose the context menu item _Add > Reference..._. In the dialog,
-tick the checkbox next to your Web API project and click the Add button to confirm.
+In Rider, right-click on the JWT Guard project node and choose the context menu item _Add > Reference..._. 
+In the dialog, tick the checkbox next to your Web API project and click the Add button to confirm.
 
 ### The type or namespace 'JwtBearer' does not exist in the namespace 'Microsoft.AspNetCore.Authentication' (are you missing an assembly reference?)
 
@@ -109,7 +113,7 @@ from your Web API, has instead received one of the following actual results:
 > The solution
 >
 > There could be multiple solutions:
-> 1. If the tests return a `404 Not Found` response in every case, then check if you have overriden the current settings in `TestSettings.cs` to set the correct `TargetUrl` for your Web API.
+> 1. If the tests return a `404 Not Found` response in every case, then check if you have overridden the current settings in `TestSettings.cs` to set the correct `TargetUrl` for your Web API.
 > 2. Your `TargetUrl` can be accessed anonymously. Either add authorization to the API endpoint, or use another endpoint as your `TargetUrl`.
 > 3. Your Web API is not yet configured to validate incoming JWT tokens. Check your API configuration.
 
