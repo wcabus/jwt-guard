@@ -6,8 +6,57 @@ permalink: /
 ---
 
 # JWT Guard
-
+{: .no_toc }
 JWT Guard is a free, open source, test suite written in C# for testing the security of JSON Web Token (JWT) implementations. It is designed to be used primarily by developers to test if their ASP.NET Core Web APIs are properly validating JWT access tokens.
+
+## Table of Contents
+{: .no_toc .text-delta }
+
+1. TOC
+{:toc}
+
+## What does JWT Guard do for you?
+
+When you have a client application that interacts with your API, you typically rely on an OAuth 2.0 flow where an 
+authorization server issues access tokens for the client (or the user using that client), to access a specific resource 
+server, also known as your API:
+
+![Authorization code flow](images/authorization-code-flow.png)
+
+*Example of "Authorization code flow" to retrieve an access token for an API resource. Image courtesy of [Postman](https://blog.postman.com/pkce-oauth-how-to/).*
+
+The easiest way to implement this flow and to protect your API when using ASP.NET Core, is to use the 
+[Microsoft.AspNetCore.Authentication.JwtBearer](https://www.nuget.org/packages/Microsoft.AspNetCore.Authentication.JwtBearer) NuGet package.
+Likewise, for other programming languages and web frameworks, similar open-source solutions exist.
+
+While it's a good practice to use well-known solutions for a problem, you're also placing your trust in an open-source
+package to protect your API resources. 
+
+And this is where JWT Guard can help you: by adding the JWT Guard test suite to your project,
+you can automatically verify on each build of your API, that the JWT validation logic still functions as expected.
+To do so, JWT Guard adds some specific test cases to your solution to validate that:
+- valid JWT access tokens are accepted by a protected endpoint of your API.
+- invalid JWT access tokens are being rejected.
+
+## How does JWT Guard work?
+
+Every test in the JWT Guard test suite is an integration test against your API. When a test runs, your API is started in 
+the background and the JWT Guard test will attempt to access the configured target API endpoint with a variety of 
+JWT access tokens. For more information about how to configure JWT Guard, see [Test Settings](test-settings.md).
+
+To issue these tokens, JWT Guard spins up its own token issuer service [^1] and slightly reconfigures your API to 
+trust tokens issued by this token service, by changing the `JwtBearerOptions.Authority` and
+`TokenValidationParameters.ValidIssuer` parameters respectively.
+
+Now, you might think that you're placing your trust in yet another open-source solution that claims to improve your 
+API's security, and you're correct in doubting that trust. JWT Guard is completely open-source, so you can verify every
+line of code. Furthermore, when you add JWT Guard to your project, you actually have a full copy of the code in your 
+own solution. 
+
+So feel free to:
+- make changes to any of the tests to better fit your API
+- replace JWT Guard's token issuer service and connect with your own service instead
+- and so on...
 
 ## Getting started
 
@@ -75,3 +124,8 @@ public partial class Program {}
 
 That should be enough in order to run the JWT Guard test suite! In case you encounter issues, we have documented the most
 frequently occuring ones in the [Troubleshooting section]({% link troubleshooting.md %}).
+
+----
+
+[^1]: JWT Guard uses [Duende IdentityServer](https://duendesoftware.com/products/identityserver) as its token issuer service because it's a well-known
+and certified OAuth 2.0 solution. While it's not free for use in commercial products, it is free to use for testing purposes.
