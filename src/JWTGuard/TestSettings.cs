@@ -16,9 +16,9 @@ public readonly struct TestSettings
         // Override the default test settings here
         // CurrentTestSettings = DefaultTestSettings with
         // {
-        //     TargetUrl = "/weatherforecast",
-        //     ValidTokenTypes = ["at+jwt"],
-        //     InvalidTokenTypes = ["none", "jwt"],
+        //     TargetUrl = "/your-api-target-endpoint",
+        //     DefaultAudience = "my-api",
+        //     AllowedAudiences = ["my-api"]
         // };
     }
 
