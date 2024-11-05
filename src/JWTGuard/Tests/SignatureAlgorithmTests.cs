@@ -34,7 +34,7 @@ public class SignatureAlgorithmTests(TargetApiWebApplicationFactory factory) : J
     }
 
     [Theory(DisplayName = "When a token uses an unsupported signature algorithm, the API should return a 401 Unauthorized response.")]
-    [MemberData(nameof(GetDisllowedAlgorithms))]
+    [MemberData(nameof(GetDisallowedAlgorithms))]
     internal async Task Accessing_AuthorizedUrl_Is_Unauthorized_For_Unsupported_Signature_Algorithms(string? signatureAlgorithm)
     {
         if (signatureAlgorithm is null)
@@ -74,7 +74,7 @@ public class SignatureAlgorithmTests(TargetApiWebApplicationFactory factory) : J
     /// <summary>
     /// Retrieves the disallowed signature algorithms for our test theories.
     /// </summary>
-    public static TheoryData<string?> GetDisllowedAlgorithms()
+    public static TheoryData<string?> GetDisallowedAlgorithms()
     {
         return TestSettings.CurrentTestSettings.DisallowedAlgorithms.Count == 0
             ? new TheoryData<string?>([null])
