@@ -1,4 +1,4 @@
-# <img src="logo.png" title="JWT Guard logo" height="75" align="center"> JWT Guard
+# ![JWT Guard logo](logo-75.png "JWT Guard logo") JWT Guard
 
 JWT Guard is a free, open source, test suite written in C# for testing the security of JSON Web Token (JWT) implementations. 
 It is designed to be used primarily by developers to test if their ASP.NET Core Web API's are properly validating JWT access tokens.

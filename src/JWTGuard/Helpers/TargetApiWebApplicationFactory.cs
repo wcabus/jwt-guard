@@ -79,7 +79,6 @@ public class TargetApiWebApplicationFactory : WebApplicationFactory<Program>, IS
             services.Configure<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme, options =>
             {
                 options.Authority = TestSettings.CurrentTestSettings.DefaultIssuer;
-                options.Audience = TestSettings.CurrentTestSettings.DefaultAudience;
                 options.TokenValidationParameters.ValidIssuer = TestSettings.CurrentTestSettings.DefaultIssuer;
             });
         });

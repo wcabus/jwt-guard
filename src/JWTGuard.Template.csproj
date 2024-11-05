@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageType>Template</PackageType>
-    <PackageVersion>1.0.0</PackageVersion>
+    <PackageVersion>1.0.1</PackageVersion>
     <PackageId>JWTGuard.Template</PackageId>
     <Title>JWT Guard Test Suite</Title>
     <Authors>Wesley Cabus</Authors>
@@ -25,6 +25,7 @@
     <Content Include="JWTGuard\**\*" Exclude="JWTGuard\**\bin\**;JWTGuard\**\obj\**;JWTGuard\**\Properties\**" />
     <Compile Remove="**\*" />
     <None Include="icon.png" Pack="true" PackagePath="\" />
+    <None Include="..\logo-75.png" Pack="true" PackagePath="\" />
     <None Include="..\README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
