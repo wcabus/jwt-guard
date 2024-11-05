@@ -32,9 +32,9 @@ If your APIs target URL needs specific claims in order to yield a valid authenti
 ## Audience
 
 Your API will typically have one or more valid audiences when accepting JWT access tokens.
-During the test setup, by default, JWT Guard will reconfigure the Web APIs JWT Bearer middleware and set the expected audience to be the one defined in `TestSettings.DefaultAudience`. 
 
 When running the audience tests, JWT Guard uses the list of `TestSettings.AllowedAudiences` and `TestSettings.DisallowedAudiences` to verify that the audience validation works as intended.
+The default audience used when generating an access token is set using `TestSettings.DefaultAudience`. 
 
 ## Issuer
 

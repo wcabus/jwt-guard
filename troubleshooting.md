@@ -113,7 +113,7 @@ from your Web API, has instead received one of the following actual results:
 > The solution
 >
 > There could be multiple solutions:
-> 1. If the tests return a `404 Not Found` response in every case, then check if you have overridden the current settings in `TestSettings.cs` to set the correct `TargetUrl` for your Web API.
+> 1. If the tests return a `404 Not Found` response in every case, then check if you have overridden the current settings in `TestSettings.cs` to set the correct `TargetUrl`, `DefaultAudience` and `AllowedAudiences` for your Web API.
 > 2. Your `TargetUrl` can be accessed anonymously. Either add authorization to the API endpoint, or use another endpoint as your `TargetUrl`.
 > 3. Your Web API is not yet configured to validate incoming JWT tokens. Check your API configuration.
 
@@ -160,7 +160,9 @@ public readonly struct TestSettings
         // Override the default test settings here
         CurrentTestSettings = DefaultTestSettings with
         {
-            TargetUrl = "/your-target-url",
+            TargetUrl = "/your-secure-api-endpoint",
+            DefaultAudience = "your-api-audience",
+            AllowedAudiences = ["your-api-audience"],
             ValidTokenTypes = ["jwt", "at+jwt"],
             InvalidTokenTypes = ["none"],
             AllowedAlgorithms = [ "ES256" ],
