@@ -25,6 +25,7 @@
     <Content Include="JWTGuard\**\*" Exclude="JWTGuard\**\bin\**;JWTGuard\**\obj\**;JWTGuard\**\Properties\**" />
     <Compile Remove="**\*" />
     <None Include="icon.png" Pack="true" PackagePath="\" />
+    <None Include="..\logo-75.png" Pack="true" PackagePath="\" />
     <None Include="..\README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
