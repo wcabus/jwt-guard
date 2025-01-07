@@ -222,3 +222,37 @@ builder.Services
         };
     });
 ```
+
+### All the test cases that expect an `Authorized` result failed.
+
+When you run the JWT Guard tests, every test which uses a valid token and expects to receive an `Authorized` response
+from your Web API, has failed the configured assertion.
+
+{: .important-title }
+> The solution
+>
+> Most likely, the default assertion delegate to verify authorized responses needs to be updated for your API.
+
+To change the default assertion, head into the `TestSettings.cs` file. The easiest way to update the settings, is to override the current settings in the static constructor:
+
+```csharp
+public readonly struct TestSettings
+{
+    /// <summary>
+    /// Static constructor for the <see cref="TestSettings"/> struct.
+    /// </summary>
+    static TestSettings()
+    {
+        // Override the default test settings here
+        CurrentTestSettings = DefaultTestSettings with
+        {
+            TargetUrl = "/your-secure-api-endpoint",
+            // Override the authorized response assertion delegate.
+            // In this example, we expect the API to return a 204 No Content response.
+            AssertAuthorizedResponse = response => Assert.Equal(StatusCodes.Status204NoContent, (int)response.StatusCode)
+        };
+    }
+    
+    // ... omitted
+}
+```

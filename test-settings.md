@@ -10,11 +10,12 @@ permalink: /test-settings
 Using the `TestSettings.cs` file, you can configure the following aspects within the JWT Guard test suite:
 
 1. [The target URL used to run every test against.](#target-url)
-2. [The default test user used to generate an access token for.](#default-test-user)
-3. [The default, allowed and disallowed audiences.](#audience)
-4. [The default, allowed and disallowed issuers.](#issuer)
-5. [The default, allowed and disallowed signature algorithms.](#signature-algorithms)
-6. [And which token types are valid or invalid.](#token-types)
+2. [The default assertions to verify authorized and unauthorized HTTP responses](#default-assertions)
+3. [The default test user used to generate an access token for.](#default-test-user)
+4. [The default, allowed and disallowed audiences.](#audience)
+5. [The default, allowed and disallowed issuers.](#issuer)
+6. [The default, allowed and disallowed signature algorithms.](#signature-algorithms)
+7. [And which token types are valid or invalid.](#token-types)
 
 Let's go over each of these configuration aspects in more detail.
 
@@ -22,6 +23,19 @@ Let's go over each of these configuration aspects in more detail.
 
 Every test needs to call a valid API endpoint of your Web API project to verify whether the call is authenticated successfully or returns an unauthorized response, depending on the test case. Using the `TestSettings.TargetUrl` property, you can configure which API endpoint to use during testing.
 
+## Default assertions 
+
+At the end of each test, the HTTP response returned by the API needs to be verified to match the test scenario. Some tests expect the HTTP response to indicate an authorized response, while others expect an unauthorized response.
+
+To configure these assertions, the `TestSettings` class has two properties:
+* `TestSettings.AssertAuthorizedResponse`: an `Action<HttpResponseMessage` which asserts that the HTTP response is a valid, authorized response.
+
+  By default, this delegate asserts that the HTTP response has a status code equal to `200 OK`. 
+ 
+* `TestSettings.AssertUnauthorizedResponse`: an `Action<HttpResponseMessage` which asserts that the HTTP response is an invalid, unauthorized response.
+
+  By default, this delegate asserts that the HTTP response has a status code equal to `401 Unauthorized`.
+ 
 ## Default test user
 
 When an access token is being generated, JWT Guard uses the `TestSettings.DefaultTestUser` property to populate the claims in the token. 
