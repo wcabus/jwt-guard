@@ -26,7 +26,7 @@ public class ExternalSignatureTests(TargetApiWebApplicationFactory factory) : Jw
         var response = await Client.GetAsync(TestSettings.CurrentTestSettings.TargetUrl);
 
         // Assert
-        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        TestSettings.CurrentTestSettings.AssertUnauthorizedResponse(response);
     }
 
     [Fact(DisplayName = "When using an external JSON Web Key by specifying the 'jwk' claim in the token, the API should return a 401 Unauthorized response.")]
@@ -40,7 +40,7 @@ public class ExternalSignatureTests(TargetApiWebApplicationFactory factory) : Jw
         var response = await Client.GetAsync(TestSettings.CurrentTestSettings.TargetUrl);
 
         // Assert
-        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        TestSettings.CurrentTestSettings.AssertUnauthorizedResponse(response);
     }
 
     [Fact(DisplayName = "When using an external certificate by specifying the 'x5u' claim in the token, the API should return a 401 Unauthorized response.")]
@@ -54,7 +54,7 @@ public class ExternalSignatureTests(TargetApiWebApplicationFactory factory) : Jw
         var response = await Client.GetAsync(TestSettings.CurrentTestSettings.TargetUrl);
 
         // Assert
-        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        TestSettings.CurrentTestSettings.AssertUnauthorizedResponse(response);
     }
 
     [Fact(DisplayName = "When using an external certificate by specifying the 'x5c' claim in the token, the API should return a 401 Unauthorized response.")]
@@ -68,7 +68,7 @@ public class ExternalSignatureTests(TargetApiWebApplicationFactory factory) : Jw
         var response = await Client.GetAsync(TestSettings.CurrentTestSettings.TargetUrl);
 
         // Assert
-        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        TestSettings.CurrentTestSettings.AssertUnauthorizedResponse(response);
     }
 
     private string GetJwt(ExternalSignatureTestCase testCase)

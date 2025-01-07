@@ -30,7 +30,7 @@ public class JwtTypeTests(TargetApiWebApplicationFactory factory) : JwtGuardTest
         var response = await Client.GetAsync(TestSettings.CurrentTestSettings.TargetUrl);
 
         // Assert
-        Assert.NotEqual(HttpStatusCode.Unauthorized, response.StatusCode);
+        TestSettings.CurrentTestSettings.AssertAuthorizedResponse(response);
     }
 
     [Theory(DisplayName = "When a token uses an unexpected token type, the API should return a 401 Unauthorized response.")]
@@ -51,7 +51,7 @@ public class JwtTypeTests(TargetApiWebApplicationFactory factory) : JwtGuardTest
         var response = await Client.GetAsync(TestSettings.CurrentTestSettings.TargetUrl);
 
         // Assert
-        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        TestSettings.CurrentTestSettings.AssertUnauthorizedResponse(response);
     }
 
     private Task<string> GetJwtAsync(string tokenType)

@@ -1,5 +1,6 @@
 ﻿using Duende.IdentityServer.Test;
 using Microsoft.IdentityModel.Tokens;
+using Xunit;
 
 namespace JWTGuard;
 
@@ -18,7 +19,8 @@ public readonly struct TestSettings
         // {
         //     TargetUrl = "/your-api-target-endpoint",
         //     DefaultAudience = "my-api",
-        //     AllowedAudiences = ["my-api"]
+        //     AllowedAudiences = ["my-api"],
+        //     AssertAuthorizedResponse = response => Assert.Equal(StatusCodes.Status204NoContent, (int)response.StatusCode)
         // };
     }
 
@@ -83,6 +85,22 @@ public readonly struct TestSettings
     /// The default target API endpoint to test. Defaults to "/weatherforecast".
     /// </summary>
     public string TargetUrl { get; init; } = "/weatherforecast";
+
+    /// <summary>
+    /// The default assertion to verify an authorized HTTP response was returned by the API.<br/>
+    /// <br/>
+    /// Defaults to verifying the API returned a <c>200 OK</c> status code. 
+    /// </summary>
+    public Action<HttpResponseMessage> AssertAuthorizedResponse { get; init; } = 
+        response => Assert.Equal(StatusCodes.Status200OK, (int)response.StatusCode);
+    
+    /// <summary>
+    /// The default assertion to verify an unauthorized HTTP response was returned by the API.<br/>
+    /// <br/>
+    /// Defaults to verifying the API returned a <c>401 Unauthorized</c> status code. 
+    /// </summary>
+    public Action<HttpResponseMessage> AssertUnauthorizedResponse { get; init; } =
+        response => Assert.Equal(StatusCodes.Status401Unauthorized, (int)response.StatusCode);
     
     /// <summary>
     /// The default test user. Defaults to a user with subject ID "1", username "alice", and password "password".
