@@ -30,7 +30,7 @@ public class SignatureAlgorithmTests(TargetApiWebApplicationFactory factory) : J
         var response = await Client.GetAsync(TestSettings.CurrentTestSettings.TargetUrl);
 
         // Assert
-        Assert.NotEqual(HttpStatusCode.Unauthorized, response.StatusCode);
+        TestSettings.CurrentTestSettings.AssertAuthorizedResponse(response);
     }
 
     [Theory(DisplayName = "When a token uses an unsupported signature algorithm, the API should return a 401 Unauthorized response.")]
@@ -51,7 +51,7 @@ public class SignatureAlgorithmTests(TargetApiWebApplicationFactory factory) : J
         var response = await Client.GetAsync(TestSettings.CurrentTestSettings.TargetUrl);
 
         // Assert
-        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        TestSettings.CurrentTestSettings.AssertUnauthorizedResponse(response);
     }
 
     private Task<string> GetJwtAsync(string signatureAlgorithm)
