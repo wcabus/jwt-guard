@@ -3,8 +3,7 @@ using System.Security.Claims;
 using System.Text;
 
 using Duende.IdentityServer.Test;
-
-using IdentityModel;
+using Duende.IdentityModel;
 
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;

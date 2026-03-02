@@ -1,5 +1,4 @@
 ﻿using System.Net.Http.Headers;
-using System.Net;
 using System.Text;
 
 using Xunit;
@@ -23,7 +22,7 @@ public class ExternalSignatureTests(TargetApiWebApplicationFactory factory) : Jw
         Client!.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
 
         // Act
-        var response = await Client.GetAsync(TestSettings.CurrentTestSettings.TargetUrl);
+        var response = await Client.GetAsync(TestSettings.CurrentTestSettings.TargetUrl, TestContext.Current.CancellationToken);
 
         // Assert
         TestSettings.CurrentTestSettings.AssertUnauthorizedResponse(response);
@@ -37,7 +36,7 @@ public class ExternalSignatureTests(TargetApiWebApplicationFactory factory) : Jw
         Client!.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
 
         // Act
-        var response = await Client.GetAsync(TestSettings.CurrentTestSettings.TargetUrl);
+        var response = await Client.GetAsync(TestSettings.CurrentTestSettings.TargetUrl, TestContext.Current.CancellationToken);
 
         // Assert
         TestSettings.CurrentTestSettings.AssertUnauthorizedResponse(response);
@@ -51,7 +50,7 @@ public class ExternalSignatureTests(TargetApiWebApplicationFactory factory) : Jw
         Client!.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
 
         // Act
-        var response = await Client.GetAsync(TestSettings.CurrentTestSettings.TargetUrl);
+        var response = await Client.GetAsync(TestSettings.CurrentTestSettings.TargetUrl, TestContext.Current.CancellationToken);
 
         // Assert
         TestSettings.CurrentTestSettings.AssertUnauthorizedResponse(response);
@@ -65,7 +64,7 @@ public class ExternalSignatureTests(TargetApiWebApplicationFactory factory) : Jw
         Client!.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
 
         // Act
-        var response = await Client.GetAsync(TestSettings.CurrentTestSettings.TargetUrl);
+        var response = await Client.GetAsync(TestSettings.CurrentTestSettings.TargetUrl, TestContext.Current.CancellationToken);
 
         // Assert
         TestSettings.CurrentTestSettings.AssertUnauthorizedResponse(response);
@@ -91,8 +90,8 @@ public class ExternalSignatureTests(TargetApiWebApplicationFactory factory) : Jw
 
         var encodedPayload = payload.Base64UrlEncode();
 
-        var headerAndPayload = "";
-        var signature = "";
+        string headerAndPayload;
+        string signature;
 
         switch (testCase)
         {

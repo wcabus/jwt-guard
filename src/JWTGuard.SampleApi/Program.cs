@@ -39,7 +39,7 @@ builder.Services.AddAuthentication()
                 var certPem = (x5c as List<object>)![0] as string;
 
                 SecurityKey? securityKey;
-                if (certPem.Contains("RSA PUBLIC", StringComparison.Ordinal))
+                if (certPem is not null && certPem.Contains("RSA PUBLIC", StringComparison.Ordinal))
                 {
                     var rsaSecurityKey = new RsaSecurityKey(RSA.Create());
                     rsaSecurityKey.Rsa.ImportFromPem(certPem);
@@ -82,7 +82,7 @@ builder.Services.AddAuthentication()
                 return [JsonWebKeyConverter.ConvertFromSecurityKey(securityKey)];
             }
 
-            return Array.Empty<SecurityKey>();
+            return [];
         }
 
         options.TokenValidationParameters = new()
@@ -147,5 +147,3 @@ record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
 {
     public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
 }
-
-public partial class Program {}
