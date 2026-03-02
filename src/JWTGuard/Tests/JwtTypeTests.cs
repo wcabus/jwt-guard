@@ -1,5 +1,4 @@
-﻿using System.Net;
-using System.Net.Http.Headers;
+﻿using System.Net.Http.Headers;
 
 using JWTGuard.Helpers;
 
@@ -27,7 +26,7 @@ public class JwtTypeTests(TargetApiWebApplicationFactory factory) : JwtGuardTest
         Client!.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
 
         // Act
-        var response = await Client.GetAsync(TestSettings.CurrentTestSettings.TargetUrl);
+        var response = await Client.GetAsync(TestSettings.CurrentTestSettings.TargetUrl, TestContext.Current.CancellationToken);
 
         // Assert
         TestSettings.CurrentTestSettings.AssertAuthorizedResponse(response);
@@ -48,7 +47,7 @@ public class JwtTypeTests(TargetApiWebApplicationFactory factory) : JwtGuardTest
         Client!.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
 
         // Act
-        var response = await Client.GetAsync(TestSettings.CurrentTestSettings.TargetUrl);
+        var response = await Client.GetAsync(TestSettings.CurrentTestSettings.TargetUrl, TestContext.Current.CancellationToken);
 
         // Assert
         TestSettings.CurrentTestSettings.AssertUnauthorizedResponse(response);
@@ -67,7 +66,7 @@ public class JwtTypeTests(TargetApiWebApplicationFactory factory) : JwtGuardTest
     public static TheoryData<string?> GetValidJwtTypes()
     {
         return TestSettings.CurrentTestSettings.ValidTokenTypes.Count == 0
-            ? new TheoryData<string?>([null])
+            ? new TheoryData<string?>((string?)null)
             : new TheoryData<string?>(TestSettings.CurrentTestSettings.ValidTokenTypes);
     }
 
@@ -77,7 +76,7 @@ public class JwtTypeTests(TargetApiWebApplicationFactory factory) : JwtGuardTest
     public static TheoryData<string?> GetInvalidJwtTypes()
     {
         return TestSettings.CurrentTestSettings.InvalidTokenTypes.Count == 0 
-            ? new TheoryData<string?>([null]) 
+            ? new TheoryData<string?>((string?)null)
             : new TheoryData<string?>(TestSettings.CurrentTestSettings.InvalidTokenTypes);
     }
 }

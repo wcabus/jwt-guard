@@ -34,7 +34,7 @@ public abstract class JwtGuardTestBase(TargetApiWebApplicationFactory factory) :
     /// <summary>
     /// Initializes the base class for a test run.
     /// </summary>
-    public Task InitializeAsync()
+    public ValueTask InitializeAsync()
     {
         Client = Factory.CreateClient(new WebApplicationFactoryClientOptions
         {
@@ -44,13 +44,13 @@ public abstract class JwtGuardTestBase(TargetApiWebApplicationFactory factory) :
         _serviceScope = Factory.Services.CreateAsyncScope();
         ServiceProvider = _serviceScope.ServiceProvider;
         
-        return Task.CompletedTask;
+        return ValueTask.CompletedTask;
     }
 
     /// <summary>
     /// Disposes the service scope and every service requested during the test run.
     /// </summary>
-    public async Task DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         await _serviceScope.DisposeAsync();
     }
